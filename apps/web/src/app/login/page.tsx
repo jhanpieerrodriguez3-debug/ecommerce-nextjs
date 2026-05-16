@@ -1,110 +1,65 @@
 "use client";
 
 import { useState } from "react";
+
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
 
   const handleLogin =
-  async () => {
-    const {
-      data,
-      error,
-    } =
-      await supabase.auth.signInWithPassword(
-        {
+    async () => {
+      const { error } =
+        await supabase.auth.signInWithPassword({
           email,
           password,
-        }
-      );
+        });
 
-    if (error) {
-      alert(
-        error.message
-      );
-      return;
-    }
+      if (error) {
+        alert(error.message);
+        return;
+      }
 
-    const {
-      data: profile,
-    } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq(
-        "id",
-        data.user.id
-      )
-      .single();
-
-    if (
-      profile?.role ===
-      "admin"
-    ) {
       window.location.href =
-        "/admin";
-    } else {
-      window.location.href =
-        "/products";
-    }
-  };
-  const handleRegister = async () => {
-    const { data, error } =
-      await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-    console.log(data);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    alert("Usuario registrado");
-  };
+        "/dashboard";
+    };
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="w-[400px] border p-10 rounded-xl">
-        <h1 className="text-3xl font-bold mb-5">
-          DigitalMarket Auth
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-700 to-blue-400">
+      <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md">
+        <h1 className="text-4xl font-bold text-center text-blue-700 mb-8">
+          DigitalMarket
         </h1>
 
         <input
           type="email"
-          placeholder="Email"
-          className="border p-2 w-full mb-3"
+          placeholder="Correo"
           value={email}
           onChange={(e) =>
             setEmail(e.target.value)
           }
+          className="border p-4 rounded-xl w-full mb-5"
         />
 
         <input
           type="password"
-          placeholder="Password"
-          className="border p-2 w-full mb-5"
+          placeholder="Contraseña"
           value={password}
           onChange={(e) =>
             setPassword(e.target.value)
           }
+          className="border p-4 rounded-xl w-full mb-6"
         />
 
         <button
           onClick={handleLogin}
-          className="bg-black text-white px-4 py-2 w-full mb-3"
+          className="bg-blue-700 text-white w-full py-4 rounded-xl"
         >
-          Login
-        </button>
-
-        <button
-          onClick={handleRegister}
-          className="bg-green-600 text-white px-4 py-2 w-full"
-        >
-          Register
+          Iniciar Sesión
         </button>
       </div>
     </main>

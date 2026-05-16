@@ -1,7 +1,9 @@
 "use client";
 
-import { useCart } from "@/context/CartContext";
 import Image from "next/image";
+
+import { useCart } from "@/context/CartContext";
+
 export default function CartPage() {
   const {
     cart,
@@ -10,40 +12,40 @@ export default function CartPage() {
 
   const total =
     cart.reduce(
-      (acc, product) =>
+      (
+        acc,
+        product
+      ) =>
         acc +
         product.price,
       0
     );
 
   return (
-    <main className="p-10">
-      <h1 className="text-4xl font-bold mb-10">
-        Shopping Cart
+    <main className="min-h-screen bg-blue-50 p-10">
+      <h1 className="text-5xl font-bold text-blue-700 mb-10">
+        Carrito de Compras
       </h1>
 
-      {cart.length === 0 ? (
-        <p>Cart vacío</p>
-      ) : (
-        <div className="space-y-5">
-          {cart.map(
-            (
-              product,
-              index
-            ) => (
-              <div
-                key={index}
-                className="border p-5 rounded-xl flex items-center gap-5"
-              >
-               <img
-  src={
-    product.image
-  }
-  alt={
-    product.title
-  }
-  className="w-[100px] h-[100px] object-cover rounded-lg"
-/>
+      <div className="grid gap-5">
+        {cart.map(
+          (product) => (
+            <div
+              key={product.id}
+              className="bg-white p-5 rounded-2xl shadow-lg flex items-center justify-between"
+            >
+              <div className="flex items-center gap-5">
+                <Image
+                  src={
+                    product.image
+                  }
+                  alt={
+                    product.title
+                  }
+                  width={100}
+                  height={100}
+                  className="rounded-xl object-cover"
+                />
 
                 <div>
                   <h2 className="text-2xl font-bold">
@@ -52,42 +54,42 @@ export default function CartPage() {
                     }
                   </h2>
 
-                  <p className="text-xl">
+                  <p className="text-xl text-gray-600">
                     $
                     {
                       product.price
                     }
                   </p>
-
-                  <button
-                    onClick={() =>
-                      removeFromCart(
-                        index
-                      )
-                    }
-                    className="bg-red-600 text-white px-4 py-2 mt-3"
-                  >
-                    Remove
-                  </button>
                 </div>
               </div>
-            )
-          )}
 
-          <div className="mt-10">
-            <h2 className="text-3xl font-bold">
-              Total: ${total}
-            </h2>
+              <button
+                onClick={() =>
+                  removeFromCart(
+                    product.id
+                  )
+                }
+                className="bg-red-600 text-white px-5 py-3 rounded-xl"
+              >
+                Eliminar
+              </button>
+            </div>
+          )
+        )}
+      </div>
 
-            <a
-              href="/checkout"
-              className="bg-black text-white px-6 py-3 inline-block mt-5"
-            >
-              Checkout
-            </a>
-          </div>
-        </div>
-      )}
+      <div className="bg-white mt-10 p-8 rounded-2xl shadow-lg">
+        <h2 className="text-3xl font-bold mb-5">
+          Total: ${total}
+        </h2>
+
+        <a
+          href="/checkout"
+          className="bg-blue-700 text-white px-6 py-4 rounded-xl"
+        >
+          Finalizar Compra
+        </a>
+      </div>
     </main>
   );
 }
