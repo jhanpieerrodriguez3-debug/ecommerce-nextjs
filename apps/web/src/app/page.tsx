@@ -1,23 +1,18 @@
-import { supabase } from "../lib/supabase";
-
-export default async function Home() {
-  const { data, error } = await supabase
-    .from("users")
-    .select("*");
-
+export default function HomePage() {
   return (
-    <main className="p-10">
-      <h1 className="text-4xl font-bold mb-5">
-        DigitalMarket
-      </h1>
+    <main className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-5xl font-bold mb-5">
+          DigitalMarket
+        </h1>
 
-      <pre>
-        {JSON.stringify(
-          { data, error },
-          null,
-          2
-        )}
-      </pre>
+        <a
+          href="/login"
+          className="bg-black text-white px-6 py-3 rounded-xl"
+        >
+          Go to Login
+        </a>
+      </div>
     </main>
   );
 }
