@@ -9,11 +9,8 @@ export default function HomePage() {
         </h1>
 
         <p className="text-2xl text-gray-700 max-w-3xl mb-10">
-          Plataforma ecommerce moderna desarrollada
-          con Next.js,
-          TypeScript,
-          Tailwind CSS
-          y Supabase.
+          Plataforma ecommerce 
+          
         </p>
 
         <div className="flex gap-5">
