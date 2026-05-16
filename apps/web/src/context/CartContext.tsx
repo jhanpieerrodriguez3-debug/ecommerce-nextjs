@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -12,17 +13,29 @@ type Product = {
   title: string;
   price: number;
   image: string;
+  quantity: number;
 };
 
 type CartContextType = {
   cart: Product[];
 
   addToCart: (
-    product: Product
+    product: Omit<
+      Product,
+      "quantity"
+    >
   ) => void;
 
   removeFromCart: (
-    index: number
+    id: number
+  ) => void;
+
+  increaseQuantity: (
+    id: number
+  ) => void;
+
+  decreaseQuantity: (
+    id: number
   ) => void;
 
   clearCart: () => void;
@@ -48,10 +61,11 @@ export function CartProvider({
       );
 
     if (storedCart) {
-      const parsedCart: Product[] =
-        JSON.parse(storedCart);
-
-      setCart(parsedCart);
+      setCart(
+        JSON.parse(
+          storedCart
+        )
+      );
     }
   }, []);
 
@@ -63,23 +77,85 @@ export function CartProvider({
   }, [cart]);
 
   const addToCart = (
-    product: Product
+    product: Omit<
+      Product,
+      "quantity"
+    >
   ) => {
-    setCart((prev) => [
-      ...prev,
-      product,
-    ]);
+    setCart((prev) => {
+      const existing =
+        prev.find(
+          (item) =>
+            item.id ===
+            product.id
+        );
+
+      if (existing) {
+        return prev.map(
+          (item) =>
+            item.id ===
+            product.id
+              ? {
+                  ...item,
+                  quantity:
+                    item.quantity +
+                    1,
+                }
+              : item
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          ...product,
+          quantity: 1,
+        },
+      ];
+    });
   };
 
   const removeFromCart = (
-    index: number
+    id: number
   ) => {
     setCart((prev) =>
       prev.filter(
-        (
-          _,
-          i
-        ) => i !== index
+        (item) =>
+          item.id !== id
+      )
+    );
+  };
+
+  const increaseQuantity = (
+    id: number
+  ) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              quantity:
+                item.quantity +
+                1,
+            }
+          : item
+      )
+    );
+  };
+
+  const decreaseQuantity = (
+    id: number
+  ) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              quantity:
+                item.quantity -
+                1,
+            }
+          : item
       )
     );
   };
@@ -95,6 +171,8 @@ export function CartProvider({
         cart,
         addToCart,
         removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
         clearCart,
       }}
     >
@@ -115,3 +193,4 @@ export function useCart() {
 
   return context;
 }
+
