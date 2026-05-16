@@ -5,6 +5,8 @@ import {
   useState,
 } from "react";
 
+import Image from "next/image";
+
 import { supabase } from "@/lib/supabase";
 
 import { useCart } from "@/context/CartContext";
@@ -51,56 +53,62 @@ export default function ProductsPage() {
   }, []);
 
   return (
-    <main className="p-10">
-      <h1 className="text-4xl font-bold mb-10">
-        Products
-      </h1>
+    <main className="min-h-screen bg-blue-50 p-10">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-5xl font-bold text-blue-700 mb-10">
+          Productos
+        </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {products.map(
-          (
-            product: Product
-          ) => (
-            <div
-              key={product.id}
-              className="border p-5 rounded-xl"
-            >
-              <img
-                src={
-                  product.image
-                }
-                alt={
-                  product.title
-                }
-                className="w-full h-[200px] object-cover rounded-lg"
-              />
-
-              <h2 className="text-2xl font-bold mt-3">
-                {
-                  product.title
-                }
-              </h2>
-
-              <p className="text-xl">
-                $
-                {
-                  product.price
-                }
-              </p>
-
-              <button
-                onClick={() =>
-                  addToCart(
-                    product
-                  )
-                }
-                className="bg-black text-white px-4 py-2 mt-3 w-full"
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {products.map(
+            (
+              product: Product
+            ) => (
+              <div
+                key={product.id}
+                className="bg-white rounded-3xl shadow-xl overflow-hidden"
               >
-                Add to Cart
-              </button>
-            </div>
-          )
-        )}
+                <Image
+                  src={
+                    product.image
+                  }
+                  alt={
+                    product.title
+                  }
+                  width={500}
+                  height={300}
+                  className="w-full h-[250px] object-cover"
+                />
+
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold mb-3">
+                    {
+                      product.title
+                    }
+                  </h2>
+
+                  <p className="text-xl text-gray-600 mb-5">
+                    $
+                    {
+                      product.price
+                    }
+                  </p>
+
+                  <button
+                    onClick={() =>
+                      addToCart(
+                        product
+                      )
+                    }
+                    className="bg-blue-700 text-white w-full py-4 rounded-xl text-lg hover:bg-blue-800 transition"
+                  >
+                    Agregar al Carrito
+                  </button>
+                </div>
+              </div>
+            )
+          )}
+        </div>
       </div>
     </main>
   );

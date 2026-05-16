@@ -30,9 +30,8 @@ export default function HomePage() {
         </h2>
 
         <p className="text-xl text-gray-700 max-w-2xl mb-8">
-          Plataforma ecommerce desarrollada con
-          Next.js, TypeScript, Tailwind CSS y
-          Supabase.
+          Plataforma ecommerce 
+          
         </p>
 
         <a
