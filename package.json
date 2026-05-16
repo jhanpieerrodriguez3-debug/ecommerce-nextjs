@@ -1,0 +1,19 @@
+{
+  "name": "digitalmarket-monorepo",
+  "private": true,
+  "scripts": {
+  "dev": "turbo run dev",
+  "build": "turbo run build",
+  "lint": "turbo run lint"
+
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "turbo": "^2.9.14",
+    "typescript": "5.9.2"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
