@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -38,12 +39,39 @@ export default function LoginPage() {
         alert(
           error.message
         );
+
         return;
       }
 
-      router.push(
-        "/dashboard"
-      );
+      const {
+        data: { user },
+      } =
+        await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { data } =
+        await supabase
+          .from("profiles")
+          .select("role")
+          .eq(
+            "id",
+            user.id
+          )
+          .single();
+
+      if (
+        data?.role ===
+        "admin"
+      ) {
+        router.push(
+          "/admin"
+        );
+      } else {
+        router.push(
+          "/stores"
+        );
+      }
     };
 
   return (
@@ -70,7 +98,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* INPUT EMAIL */}
+        {/* EMAIL */}
         <div className="mb-5">
           <label className="text-white block mb-2">
             Correo
@@ -89,7 +117,7 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* INPUT PASSWORD */}
+        {/* PASSWORD */}
         <div className="mb-8">
           <label className="text-white block mb-2">
             Contraseña
@@ -133,3 +161,4 @@ export default function LoginPage() {
     </main>
   );
 }
+

@@ -1,109 +1,113 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-[#050816] text-white overflow-hidden">
-      {/* HERO */}
-      <section className="relative">
-        {/* EFECTOS */}
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-cyan-500 opacity-20 blur-[120px]" />
+    <main className="min-h-screen bg-[#050816] text-white relative overflow-hidden">
+      {/* EFECTOS */}
+      <div className="absolute w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full top-[-100px] left-[-100px]" />
 
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-700 opacity-20 blur-[120px]" />
+      <div className="absolute w-[400px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full bottom-[-100px] right-[-100px]" />
 
-        <div className="max-w-7xl mx-auto px-10 py-32 grid grid-cols-1 md:grid-cols-2 items-center gap-20 relative z-10">
-          {/* TEXTO */}
-          <div>
-            <p className="text-cyan-400 text-xl mb-5 font-semibold">
-              Ecommerce Moderno
-            </p>
+      <section className="relative z-10 max-w-7xl mx-auto px-10 py-24 grid lg:grid-cols-2 gap-20 items-center">
+        {/* TEXTO */}
+        <div>
+          <p className="text-cyan-400 text-2xl font-bold mb-6">
+            Ecommerce Moderno
+          </p>
 
-            <h1 className="text-7xl font-black leading-tight mb-8">
-              Compra productos
-              <span className="text-cyan-400">
-                {" "}
-                premium
-              </span>
-              <br />
-              en DigitalMarket
-            </h1>
+          <h1 className="text-7xl font-black leading-tight mb-8">
+            Compra productos
+            <span className="text-cyan-400">
+              {" "}
+              frescos
+            </span>
+            <br />
+            para tu hogar
+          </h1>
 
-            <p className="text-gray-300 text-2xl mb-10 leading-relaxed">
-              Plataforma ecommerce profesional
-              desarrollada con Next.js,
-              Tailwind CSS,
-              TypeScript
-              y Supabase.
-            </p>
+          <p className="text-gray-300 text-2xl leading-relaxed mb-10">
+            Encuentra productos comestibles,
+            bebidas, snacks y más desde
+            nuestra tienda online profesional.
+          </p>
 
-            <div className="flex gap-5">
-              <a
-                href="/products"
-                className="bg-cyan-400 text-black px-8 py-4 rounded-2xl text-xl font-bold shadow-2xl hover:scale-110 transition duration-300"
-              >
-                Comprar Ahora
-              </a>
+          {/* BOTONES */}
+          <div className="flex gap-5">
+            <Link
+              href="/login"
+              className="bg-gradient-to-r from-cyan-400 to-blue-600 px-8 py-4 rounded-2xl text-xl font-bold hover:scale-105 transition duration-300 shadow-[0_0_30px_rgba(34,211,238,0.5)]"
+            >
+              Login
+            </Link>
 
-              <a
-                href="/login"
-                className="border border-cyan-400 px-8 py-4 rounded-2xl text-xl hover:bg-cyan-400 hover:text-black transition duration-300"
-              >
-                Login
-              </a>
-            </div>
+            <Link
+              href="/register"
+              className="border border-cyan-400 text-cyan-400 px-8 py-4 rounded-2xl text-xl font-bold hover:bg-cyan-400 hover:text-black transition duration-300"
+            >
+              Register
+            </Link>
           </div>
+        </div>
 
-          {/* IMAGEN */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-cyan-400 blur-[100px] opacity-30 rounded-full" />
+        {/* IMAGEN */}
+        <div className="relative">
+          <div className="absolute inset-0 bg-cyan-500/20 blur-[80px] rounded-full" />
 
-            <Image
-              src="/hero.jpg"
-              alt="Ecommerce"
-              width={700}
-              height={500}
-              className="relative rounded-3xl shadow-[0_0_50px_rgba(34,211,238,0.5)] hover:scale-105 transition duration-500"
-            />
-          </div>
+          <img
+            src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2074&auto=format&fit=crop"
+            alt="Tienda"
+            className="relative rounded-[40px] shadow-[0_0_50px_rgba(34,211,238,0.4)] border border-cyan-400/20"
+          />
         </div>
       </section>
 
       {/* FEATURES */}
-      <section className="max-w-7xl mx-auto px-10 py-24">
-        <h2 className="text-5xl font-black text-center mb-20">
-          ¿Por qué elegirnos?
-        </h2>
+      <section className="relative z-10 max-w-7xl mx-auto px-10 pb-24">
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* CARD 1 */}
+          <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] p-8 shadow-[0_0_30px_rgba(34,211,238,0.15)]">
+            <div className="text-5xl mb-5">
+              🥦
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/10 p-10 rounded-3xl shadow-2xl hover:-translate-y-5 transition duration-500">
-            <h3 className="text-3xl font-bold text-cyan-400 mb-5">
-              Productos Premium
-            </h3>
+            <h2 className="text-3xl font-black mb-4">
+              Productos Frescos
+            </h2>
 
-            <p className="text-gray-300 text-lg leading-relaxed">
-              Productos modernos y de alta calidad
-              para clientes exigentes.
+            <p className="text-gray-400 text-lg">
+              Compra productos de calidad
+              para tu hogar.
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xl border border-white/10 p-10 rounded-3xl shadow-2xl hover:-translate-y-5 transition duration-500">
-            <h3 className="text-3xl font-bold text-cyan-400 mb-5">
-              Seguridad
-            </h3>
+          {/* CARD 2 */}
+          <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] p-8 shadow-[0_0_30px_rgba(34,211,238,0.15)]">
+            <div className="text-5xl mb-5">
+              🚚
+            </div>
 
-            <p className="text-gray-300 text-lg leading-relaxed">
-              Sistema protegido con autenticación
-              y seguridad moderna.
+            <h2 className="text-3xl font-black mb-4">
+              Delivery Rápido
+            </h2>
+
+            <p className="text-gray-400 text-lg">
+              Entregas rápidas y seguras.
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xl border border-white/10 p-10 rounded-3xl shadow-2xl hover:-translate-y-5 transition duration-500">
-            <h3 className="text-3xl font-bold text-cyan-400 mb-5">
-              Envíos Rápidos
-            </h3>
+          {/* CARD 3 */}
+          <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] p-8 shadow-[0_0_30px_rgba(34,211,238,0.15)]">
+            <div className="text-5xl mb-5">
+              💳
+            </div>
 
-            <p className="text-gray-300 text-lg leading-relaxed">
-              Experiencia rápida y moderna
-              de compra online.
+            <h2 className="text-3xl font-black mb-4">
+              Pagos Seguros
+            </h2>
+
+            <p className="text-gray-400 text-lg">
+              Métodos de pago rápidos y
+              protegidos.
             </p>
           </div>
         </div>

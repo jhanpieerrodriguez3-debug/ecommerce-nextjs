@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
@@ -9,136 +11,141 @@ export default function CartPage() {
     clearCart,
   } = useCart();
 
+  // TOTAL
   const total =
     cart.reduce(
       (
         acc,
-        item
+        product
       ) =>
         acc +
-        item.price,
+        product.price,
       0
     );
 
   return (
-    <main className="min-h-screen bg-[#050816] text-white p-10 relative overflow-hidden">
-      {/* GLOW */}
-      <div className="absolute w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full top-[-100px] left-[-100px]" />
-
-      <div className="absolute w-[400px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full bottom-[-100px] right-[-100px]" />
-
-      <div className="relative z-10 max-w-6xl mx-auto">
+    <main className="min-h-screen bg-[#050816] text-white p-10">
+      <div className="max-w-7xl mx-auto">
         {/* HEADER */}
-        <div className="mb-12">
+        <div className="mb-14">
           <h1 className="text-6xl font-black mb-4">
             🛒 Carrito
           </h1>
 
           <p className="text-gray-400 text-xl">
-            Administra tus productos seleccionados
+            Productos agregados
+            por el cliente
           </p>
         </div>
 
-        {/* EMPTY */}
+        {/* VACÍO */}
         {cart.length ===
-        0 ? (
-          <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] p-16 text-center shadow-[0_0_40px_rgba(34,211,238,0.15)]">
+          0 && (
+          <div className="bg-white/10 border border-white/10 rounded-[30px] p-10 text-center">
             <h2 className="text-4xl font-black mb-4">
               Tu carrito está vacío
             </h2>
 
-            <p className="text-gray-400 text-lg">
-              Agrega productos para comenzar tu compra
+            <p className="text-gray-400">
+              Agrega productos para
+              comenzar a comprar
             </p>
           </div>
-        ) : (
-          <>
-            {/* GRID */}
-            <div className="grid gap-8 mb-10">
-              {cart.map(
-                (
-                  product,
-                  index
-                ) => (
-                  <div
-                    key={
-                      index
+        )}
+
+        {/* PRODUCTOS */}
+        <div className="grid gap-8">
+          {cart.map(
+            (
+              product,
+              index
+            ) => (
+              <div
+                key={index}
+                className="bg-white/10 border border-white/10 rounded-[30px] p-6 flex items-center gap-6"
+              >
+                {/* IMAGE */}
+                <div className="relative w-40 h-40 rounded-2xl overflow-hidden">
+                  <Image
+                    src={
+                      product.image
                     }
-                    className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] p-6 flex flex-col md:flex-row gap-6 items-center shadow-[0_0_40px_rgba(34,211,238,0.15)]"
-                  >
-                    {/* IMAGE */}
-                    <img
-                      src={
-                        product.image
-                      }
-                      alt={
-                        product.title
-                      }
-                      className="w-full md:w-[220px] h-[220px] object-cover rounded-2xl"
-                    />
+                    alt={
+                      product.title
+                    }
+                    fill
+                    className="object-cover"
+                  />
+                </div>
 
-                    {/* INFO */}
-                    <div className="flex-1">
-                      <h2 className="text-4xl font-black mb-4">
-                        {
-                          product.title
-                        }
-                      </h2>
-
-                      <p className="text-cyan-400 text-3xl font-bold mb-6">
-                        $
-                        {
-                          product.price
-                        }
-                      </p>
-
-                      <button
-                        onClick={() =>
-                          removeFromCart(
-                            index
-                          )
-                        }
-                        className="bg-red-600 hover:bg-red-700 transition px-6 py-3 rounded-2xl text-lg font-bold shadow-xl"
-                      >
-                        Eliminar producto
-                      </button>
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
-
-            {/* TOTAL */}
-            <div className="bg-gradient-to-r from-cyan-500/20 to-blue-600/20 border border-cyan-400/20 rounded-[30px] p-10 shadow-[0_0_50px_rgba(34,211,238,0.2)]">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div>
-                  <p className="text-gray-400 text-lg">
-                    Total a pagar
-                  </p>
-
-                  <h2 className="text-6xl font-black text-cyan-400">
-                    $
-                    {total}
+                {/* CONTENT */}
+                <div className="flex-1">
+                  <h2 className="text-3xl font-black mb-3">
+                    {
+                      product.title
+                    }
                   </h2>
-                </div>
 
-                <div className="flex gap-5">
-                  <button
-                    onClick={
-                      clearCart
+                  <p className="text-cyan-400 text-2xl font-bold">
+                    $
+                    {
+                      product.price
                     }
-                    className="bg-red-600 hover:bg-red-700 transition px-8 py-4 rounded-2xl text-lg font-bold shadow-xl"
-                  >
-                    Vaciar carrito
-                  </button>
-
-                  <button className="bg-gradient-to-r from-cyan-400 to-blue-600 px-8 py-4 rounded-2xl text-lg font-bold hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(34,211,238,0.5)]">
-                    Finalizar compra
-                  </button>
+                  </p>
                 </div>
+
+                {/* DELETE */}
+                <button
+                  onClick={() =>
+                    removeFromCart(
+                      index
+                    )
+                  }
+                  className="bg-red-600 hover:bg-red-700 px-6 py-4 rounded-2xl font-bold"
+                >
+                  Eliminar
+                </button>
               </div>
+            )
+          )}
+        </div>
+
+        {/* TOTAL */}
+        {cart.length >
+          0 && (
+          <div className="mt-14 bg-white/10 border border-white/10 rounded-[30px] p-10">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-4xl font-black">
+                Total:
+              </h2>
+
+              <p className="text-5xl font-black text-cyan-400">
+                ${total}
+              </p>
             </div>
-          </>
+
+            <div className="flex gap-5">
+              {/* CLEAR */}
+              <button
+                onClick={
+                  clearCart
+                }
+                className="bg-red-600 hover:bg-red-700 px-8 py-4 rounded-2xl text-lg font-bold"
+              >
+                Vaciar carrito
+              </button>
+
+              {/* BUY */}
+              <button className="bg-gradient-to-r from-cyan-400 to-blue-600 px-8 py-4 rounded-2xl text-lg font-bold hover:scale-105 transition">
+                <a
+  href="/checkout"
+  className="bg-gradient-to-r from-cyan-400 to-blue-600 px-8 py-4 rounded-2xl text-lg font-bold hover:scale-105 transition"
+>
+  Comprar ahora
+</a>
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </main>

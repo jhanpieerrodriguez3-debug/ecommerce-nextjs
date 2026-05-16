@@ -5,6 +5,8 @@ import {
   useState,
 } from "react";
 
+import Image from "next/image";
+
 import { supabase } from "@/lib/supabase";
 
 type Product = {
@@ -27,12 +29,16 @@ export default function AdminPage() {
   const [products, setProducts] =
     useState<Product[]>([]);
 
+  // OBTENER PRODUCTOS
   const getProducts =
     async () => {
       const { data } =
         await supabase
           .from("products")
-          .select("*");
+          .select("*")
+          .order("id", {
+            ascending: false,
+          });
 
       setProducts(
         (data ||
@@ -44,8 +50,21 @@ export default function AdminPage() {
     void getProducts();
   }, []);
 
+  // CREAR PRODUCTO
   const handleCreate =
     async () => {
+      if (
+        !title ||
+        !price ||
+        !image
+      ) {
+        alert(
+          "Completa todos los campos"
+        );
+
+        return;
+      }
+
       const { error } =
         await supabase
           .from("products")
@@ -75,6 +94,7 @@ export default function AdminPage() {
       void getProducts();
     };
 
+  // ELIMINAR PRODUCTO
   const handleDelete =
     async (
       id: number
@@ -101,26 +121,22 @@ export default function AdminPage() {
     };
 
   return (
-    <main className="min-h-screen bg-[#050816] text-white p-10 relative overflow-hidden">
-      {/* GLOW */}
-      <div className="absolute w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full top-[-100px] left-[-100px]" />
-
-      <div className="absolute w-[400px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full bottom-[-100px] right-[-100px]" />
-
-      <div className="relative z-10 max-w-7xl mx-auto">
+    <main className="min-h-screen bg-[#050816] text-white p-10">
+      <div className="max-w-7xl mx-auto">
         {/* HEADER */}
         <div className="mb-14">
           <h1 className="text-6xl font-black mb-4">
-            🛠️ Admin Panel
+            🛠️ Panel Admin
           </h1>
 
           <p className="text-gray-400 text-xl">
-            Gestiona productos del ecommerce
+            Administra los productos
+            de tu tienda
           </p>
         </div>
 
         {/* FORM */}
-        <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] p-10 mb-14 shadow-[0_0_40px_rgba(34,211,238,0.15)]">
+        <div className="bg-white/10 border border-white/10 rounded-[30px] p-10 mb-14">
           <h2 className="text-3xl font-black mb-8 text-cyan-400">
             Crear Producto
           </h2>
@@ -129,14 +145,14 @@ export default function AdminPage() {
             {/* TITLE */}
             <input
               type="text"
-              placeholder="Nombre del producto"
+              placeholder="Nombre"
               value={title}
               onChange={(e) =>
                 setTitle(
                   e.target.value
                 )
               }
-              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 text-white outline-none focus:border-cyan-400 transition"
+              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 outline-none"
             />
 
             {/* PRICE */}
@@ -149,56 +165,56 @@ export default function AdminPage() {
                   e.target.value
                 )
               }
-              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 text-white outline-none focus:border-cyan-400 transition"
+              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 outline-none"
             />
 
             {/* IMAGE */}
             <input
               type="text"
-              placeholder="URL de imagen"
+              placeholder="URL imagen"
               value={image}
               onChange={(e) =>
                 setImage(
                   e.target.value
                 )
               }
-              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 text-white outline-none focus:border-cyan-400 transition"
+              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 outline-none"
             />
           </div>
 
-          {/* BUTTON */}
           <button
             onClick={
               handleCreate
             }
-            className="mt-8 bg-gradient-to-r from-cyan-400 to-blue-600 px-8 py-4 rounded-2xl text-lg font-bold hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(34,211,238,0.5)]"
+            className="mt-8 bg-gradient-to-r from-cyan-400 to-blue-600 px-8 py-4 rounded-2xl text-lg font-bold hover:scale-105 transition"
           >
-            Crear Producto
+            Crear producto
           </button>
         </div>
 
-        {/* PRODUCTS */}
+        {/* PRODUCTOS */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map(
-            (
-              product: Product
-            ) => (
+            (product) => (
               <div
                 key={
                   product.id
                 }
-                className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] overflow-hidden shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:scale-[1.03] transition duration-300"
+                className="bg-white/10 border border-white/10 rounded-[30px] overflow-hidden"
               >
                 {/* IMAGE */}
-                <img
-                  src={
-                    product.image
-                  }
-                  alt={
-                    product.title
-                  }
-                  className="w-full h-[260px] object-cover"
-                />
+                <div className="relative w-full h-[260px]">
+                  <Image
+                    src={
+                      product.image
+                    }
+                    alt={
+                      product.title
+                    }
+                    fill
+                    className="object-cover"
+                  />
+                </div>
 
                 {/* CONTENT */}
                 <div className="p-6">
@@ -215,16 +231,15 @@ export default function AdminPage() {
                     }
                   </p>
 
-                  {/* DELETE */}
                   <button
                     onClick={() =>
                       handleDelete(
                         product.id
                       )
                     }
-                    className="w-full bg-red-600 hover:bg-red-700 transition py-4 rounded-2xl text-lg font-bold shadow-xl"
+                    className="w-full bg-red-600 hover:bg-red-700 py-4 rounded-2xl text-lg font-bold"
                   >
-                    Eliminar producto
+                    Eliminar
                   </button>
                 </div>
               </div>
