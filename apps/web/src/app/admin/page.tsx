@@ -5,8 +5,6 @@ import {
   useState,
 } from "react";
 
-import Image from "next/image";
-
 import { supabase } from "@/lib/supabase";
 
 type Product = {
@@ -18,35 +16,23 @@ type Product = {
 
 export default function AdminPage() {
   const [title, setTitle] =
-    useState<string>("");
+    useState("");
 
   const [price, setPrice] =
-    useState<string>("");
+    useState("");
 
   const [image, setImage] =
-    useState<string>("");
+    useState("");
 
   const [products, setProducts] =
     useState<Product[]>([]);
 
-  const [
-    editingId,
-    setEditingId,
-  ] = useState<number | null>(
-    null
-  );
-
   const getProducts =
-    async (): Promise<void> => {
-      const { data, error } =
+    async () => {
+      const { data } =
         await supabase
           .from("products")
           .select("*");
-
-      if (error) {
-        console.log(error);
-        return;
-      }
 
       setProducts(
         (data ||
@@ -55,16 +41,11 @@ export default function AdminPage() {
     };
 
   useEffect(() => {
-    const fetchProducts =
-      async () => {
-        await getProducts();
-      };
-
-    fetchProducts();
+    void getProducts();
   }, []);
 
   const handleCreate =
-    async (): Promise<void> => {
+    async () => {
       const { error } =
         await supabase
           .from("products")
@@ -79,6 +60,7 @@ export default function AdminPage() {
         alert(
           error.message
         );
+
         return;
       }
 
@@ -90,52 +72,13 @@ export default function AdminPage() {
       setPrice("");
       setImage("");
 
-      await getProducts();
-    };
-
-  const handleUpdate =
-    async (): Promise<void> => {
-      if (!editingId)
-        return;
-
-      const { error } =
-        await supabase
-          .from("products")
-          .update({
-            title,
-            price:
-              Number(price),
-            image,
-          })
-          .eq(
-            "id",
-            editingId
-          );
-
-      if (error) {
-        alert(
-          error.message
-        );
-        return;
-      }
-
-      alert(
-        "Producto actualizado"
-      );
-
-      setEditingId(null);
-
-      setTitle("");
-      setPrice("");
-      setImage("");
-
-      await getProducts();
+      void getProducts();
     };
 
   const handleDelete =
     async (
       id: number
-    ): Promise<void> => {
+    ) => {
       const { error } =
         await supabase
           .from("products")
@@ -146,6 +89,7 @@ export default function AdminPage() {
         alert(
           error.message
         );
+
         return;
       }
 
@@ -153,88 +97,88 @@ export default function AdminPage() {
         "Producto eliminado"
       );
 
-      await getProducts();
+      void getProducts();
     };
 
   return (
-    <main className="min-h-screen bg-blue-50 p-10">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-5xl font-bold text-blue-700 mb-10">
-          Panel de Administración
-        </h1>
+    <main className="min-h-screen bg-[#050816] text-white p-10 relative overflow-hidden">
+      {/* GLOW */}
+      <div className="absolute w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full top-[-100px] left-[-100px]" />
 
-        {/* Formulario */}
-        <div className="bg-white p-8 rounded-3xl shadow-xl mb-10">
-          <h2 className="text-3xl font-bold mb-6 text-blue-700">
-            {editingId
-              ? "Editar Producto"
-              : "Crear Producto"}
+      <div className="absolute w-[400px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full bottom-[-100px] right-[-100px]" />
+
+      <div className="relative z-10 max-w-7xl mx-auto">
+        {/* HEADER */}
+        <div className="mb-14">
+          <h1 className="text-6xl font-black mb-4">
+            🛠️ Admin Panel
+          </h1>
+
+          <p className="text-gray-400 text-xl">
+            Gestiona productos del ecommerce
+          </p>
+        </div>
+
+        {/* FORM */}
+        <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] p-10 mb-14 shadow-[0_0_40px_rgba(34,211,238,0.15)]">
+          <h2 className="text-3xl font-black mb-8 text-cyan-400">
+            Crear Producto
           </h2>
 
-          <div className="grid gap-5">
+          <div className="grid md:grid-cols-3 gap-5">
+            {/* TITLE */}
             <input
               type="text"
-              placeholder="Título"
+              placeholder="Nombre del producto"
               value={title}
-              onChange={(
-                e
-              ) =>
+              onChange={(e) =>
                 setTitle(
                   e.target.value
                 )
               }
-              className="border p-4 rounded-xl"
+              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 text-white outline-none focus:border-cyan-400 transition"
             />
 
+            {/* PRICE */}
             <input
               type="number"
               placeholder="Precio"
               value={price}
-              onChange={(
-                e
-              ) =>
+              onChange={(e) =>
                 setPrice(
                   e.target.value
                 )
               }
-              className="border p-4 rounded-xl"
+              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 text-white outline-none focus:border-cyan-400 transition"
             />
 
+            {/* IMAGE */}
             <input
               type="text"
-              placeholder="URL de Imagen"
+              placeholder="URL de imagen"
               value={image}
-              onChange={(
-                e
-              ) =>
+              onChange={(e) =>
                 setImage(
                   e.target.value
                 )
               }
-              className="border p-4 rounded-xl"
+              className="bg-black/30 border border-cyan-400/20 rounded-2xl p-4 text-white outline-none focus:border-cyan-400 transition"
             />
-
-            <button
-              onClick={() => {
-                if (
-                  editingId
-                ) {
-                  handleUpdate();
-                } else {
-                  handleCreate();
-                }
-              }}
-              className="bg-blue-700 text-white py-4 rounded-xl text-lg"
-            >
-              {editingId
-                ? "Actualizar Producto"
-                : "Crear Producto"}
-            </button>
           </div>
+
+          {/* BUTTON */}
+          <button
+            onClick={
+              handleCreate
+            }
+            className="mt-8 bg-gradient-to-r from-cyan-400 to-blue-600 px-8 py-4 rounded-2xl text-lg font-bold hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(34,211,238,0.5)]"
+          >
+            Crear Producto
+          </button>
         </div>
 
-        {/* Productos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* PRODUCTS */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map(
             (
               product: Product
@@ -243,71 +187,45 @@ export default function AdminPage() {
                 key={
                   product.id
                 }
-                className="bg-white rounded-3xl shadow-xl overflow-hidden"
+                className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] overflow-hidden shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:scale-[1.03] transition duration-300"
               >
-                <Image
+                {/* IMAGE */}
+                <img
                   src={
                     product.image
                   }
                   alt={
                     product.title
                   }
-                  width={500}
-                  height={300}
-                  className="w-full h-[250px] object-cover"
+                  className="w-full h-[260px] object-cover"
                 />
 
+                {/* CONTENT */}
                 <div className="p-6">
-                  <h2 className="text-2xl font-bold mb-3">
+                  <h2 className="text-3xl font-black mb-3">
                     {
                       product.title
                     }
                   </h2>
 
-                  <p className="text-xl text-gray-600 mb-5">
+                  <p className="text-cyan-400 text-2xl font-bold mb-6">
                     $
                     {
                       product.price
                     }
                   </p>
 
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        setEditingId(
-                          product.id
-                        );
-
-                        setTitle(
-                          product.title
-                        );
-
-                        setPrice(
-                          String(
-                            product.price
-                          )
-                        );
-
-                        setImage(
-                          product.image
-                        );
-                      }}
-                      className="bg-yellow-500 text-white px-5 py-3 rounded-xl w-full"
-                    >
-                      Editar
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        handleDelete(
-                          product.id
-                        )
-                      }
-                      className="bg-red-600 text-white px-5 py-3 rounded-xl w-full"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
+                  {/* DELETE */}
+                  <button
+                    onClick={() =>
+                      handleDelete(
+                        product.id
+                      )
+                    }
+                    className="w-full bg-red-600 hover:bg-red-700 transition py-4 rounded-2xl text-lg font-bold shadow-xl"
+                  >
+                    Eliminar producto
+                  </button>
                 </div>
               </div>
             )

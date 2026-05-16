@@ -12,7 +12,7 @@ import Link from "next/link";
 
 import { supabase } from "@/lib/supabase";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router =
     useRouter();
 
@@ -24,10 +24,10 @@ export default function LoginPage() {
     setPassword,
   ] = useState("");
 
-  const handleLogin =
+  const handleRegister =
     async () => {
       const { error } =
-        await supabase.auth.signInWithPassword(
+        await supabase.auth.signUp(
           {
             email,
             password,
@@ -41,8 +41,12 @@ export default function LoginPage() {
         return;
       }
 
+      alert(
+        "Cuenta creada correctamente"
+      );
+
       router.push(
-        "/dashboard"
+        "/login"
       );
     };
 
@@ -58,19 +62,19 @@ export default function LoginPage() {
         {/* TITLE */}
         <div className="text-center mb-10">
           <div className="w-20 h-20 rounded-3xl bg-gradient-to-r from-cyan-400 to-blue-600 flex items-center justify-center text-4xl mx-auto mb-5 shadow-[0_0_30px_rgba(34,211,238,0.7)]">
-            🛍️
+            🚀
           </div>
 
           <h1 className="text-5xl font-black text-white mb-3">
-            Bienvenido
+            Crear Cuenta
           </h1>
 
           <p className="text-gray-400">
-            Inicia sesión en DigitalMarket
+            Únete a DigitalMarket
           </p>
         </div>
 
-        {/* INPUT EMAIL */}
+        {/* EMAIL */}
         <div className="mb-5">
           <label className="text-white block mb-2">
             Correo
@@ -89,7 +93,7 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* INPUT PASSWORD */}
+        {/* PASSWORD */}
         <div className="mb-8">
           <label className="text-white block mb-2">
             Contraseña
@@ -111,22 +115,22 @@ export default function LoginPage() {
         {/* BUTTON */}
         <button
           onClick={
-            handleLogin
+            handleRegister
           }
           className="w-full bg-gradient-to-r from-cyan-400 to-blue-600 py-4 rounded-2xl text-xl font-bold text-white shadow-[0_0_20px_rgba(34,211,238,0.6)] hover:scale-105 transition duration-300"
         >
-          Iniciar Sesión
+          Crear Cuenta
         </button>
 
-        {/* REGISTER */}
+        {/* LOGIN */}
         <p className="text-center text-gray-400 mt-8">
-          ¿No tienes cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
 
           <Link
-            href="/register"
+            href="/login"
             className="text-cyan-400 hover:text-cyan-300"
           >
-            Crear cuenta
+            Iniciar sesión
           </Link>
         </p>
       </div>

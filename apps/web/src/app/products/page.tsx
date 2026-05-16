@@ -5,8 +5,6 @@ import {
   useState,
 } from "react";
 
-import Image from "next/image";
-
 import { supabase } from "@/lib/supabase";
 
 import { useCart } from "@/context/CartContext";
@@ -26,18 +24,11 @@ export default function ProductsPage() {
     useCart();
 
   const getProducts =
-    async (): Promise<void> => {
-      const {
-        data,
-        error,
-      } = await supabase
-        .from("products")
-        .select("*");
-
-      if (error) {
-        console.log(error);
-        return;
-      }
+    async () => {
+      const { data } =
+        await supabase
+          .from("products")
+          .select("*");
 
       setProducts(
         (data ||
@@ -46,50 +37,62 @@ export default function ProductsPage() {
     };
 
   useEffect(() => {
-    const fetchProducts =
-      async () => {
-        await getProducts();
-      };
-
-    fetchProducts();
+    void getProducts();
   }, []);
 
   return (
-    <main className="min-h-screen bg-blue-50 p-10">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-5xl font-bold text-blue-700 mb-10 text-center">
-          Nuestros Productos
-        </h1>
+    <main className="min-h-screen bg-[#050816] text-white p-10 relative overflow-hidden">
+      {/* GLOW */}
+      <div className="absolute w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full top-[-100px] left-[-100px]" />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div className="absolute w-[400px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full bottom-[-100px] right-[-100px]" />
+
+      <div className="relative z-10 max-w-7xl mx-auto">
+        {/* HEADER */}
+        <div className="mb-14">
+          <h1 className="text-6xl font-black mb-4">
+            Productos
+          </h1>
+
+          <p className="text-gray-400 text-xl">
+            Descubre los mejores productos digitales
+          </p>
+        </div>
+
+        {/* GRID */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map(
             (
               product: Product
             ) => (
               <div
-                key={product.id}
-                className="bg-white rounded-3xl shadow-xl overflow-hidden hover:scale-105 transition duration-300"
+                key={
+                  product.id
+                }
+                className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-[30px] overflow-hidden shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:scale-[1.03] transition duration-300"
               >
-                <Image
-                  src={
-                    product.image
-                  }
-                  alt={
-                    product.title
-                  }
-                  width={500}
-                  height={300}
-                  className="w-full h-[250px] object-cover"
-                />
+                {/* IMAGE */}
+                <div className="overflow-hidden">
+                  <img
+                    src={
+                      product.image
+                    }
+                    alt={
+                      product.title
+                    }
+                    className="w-full h-[260px] object-cover hover:scale-110 transition duration-500"
+                  />
+                </div>
 
+                {/* CONTENT */}
                 <div className="p-6">
-                  <h2 className="text-3xl font-bold text-blue-700 mb-3">
+                  <h2 className="text-3xl font-black mb-3">
                     {
                       product.title
                     }
                   </h2>
 
-                  <p className="text-2xl text-gray-700 mb-6">
+                  <p className="text-cyan-400 text-2xl font-bold mb-6">
                     $
                     {
                       product.price
@@ -102,9 +105,9 @@ export default function ProductsPage() {
                         product
                       )
                     }
-                    className="bg-blue-700 text-white w-full py-4 rounded-2xl text-lg font-bold hover:bg-blue-800 transition"
+                    className="w-full bg-gradient-to-r from-cyan-400 to-blue-600 py-4 rounded-2xl text-lg font-bold hover:scale-105 transition duration-300 shadow-[0_0_20px_rgba(34,211,238,0.5)]"
                   >
-                    Agregar al Carrito
+                    Agregar al carrito
                   </button>
                 </div>
               </div>

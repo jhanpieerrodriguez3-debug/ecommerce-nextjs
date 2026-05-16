@@ -24,6 +24,8 @@ type CartContextType = {
   removeFromCart: (
     index: number
   ) => void;
+
+  clearCart: () => void;
 };
 
 const CartContext =
@@ -37,7 +39,7 @@ export function CartProvider({
   children: React.ReactNode;
 }) {
   const [cart, setCart] =
-  useState<Array<Product>>([]);
+    useState<Product[]>([]);
 
   useEffect(() => {
     const storedCart =
@@ -46,52 +48,46 @@ export function CartProvider({
       );
 
     if (storedCart) {
-      setCart(
-  JSON.parse(
-    storedCart
-  ) as Product[]
-);
+      const parsedCart: Product[] =
+        JSON.parse(storedCart);
+
+      setCart(parsedCart);
     }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(cart)
+    );
+  }, [cart]);
 
   const addToCart = (
     product: Product
   ) => {
-    const updatedCart = [
-      ...cart,
+    setCart((prev) => [
+      ...prev,
       product,
-    ];
-
-    setCart(updatedCart);
-
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(
-        updatedCart
-      )
-    );
+    ]);
   };
 
   const removeFromCart = (
     index: number
   ) => {
-    const updatedCart =
-      cart.filter(
+    setCart((prev) =>
+      prev.filter(
         (
-          _: Product,
-          i: number
+          _,
+          i
         ) => i !== index
-      );
-
-    setCart(updatedCart);
-
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(
-        updatedCart
       )
     );
   };
+
+  const clearCart =
+    () => {
+      setCart([]);
+    };
 
   return (
     <CartContext.Provider
@@ -99,6 +95,7 @@ export function CartProvider({
         cart,
         addToCart,
         removeFromCart,
+        clearCart,
       }}
     >
       {children}
@@ -108,13 +105,11 @@ export function CartProvider({
 
 export function useCart() {
   const context =
-    useContext(
-      CartContext
-    );
+    useContext(CartContext);
 
   if (!context) {
     throw new Error(
-      "useCart must be used within CartProvider"
+      "useCart debe usarse dentro de CartProvider"
     );
   }
 
