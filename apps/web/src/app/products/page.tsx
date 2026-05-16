@@ -27,10 +27,12 @@ export default function ProductsPage() {
 
   const getProducts =
     async (): Promise<void> => {
-      const { data, error } =
-        await supabase
-          .from("products")
-          .select("*");
+      const {
+        data,
+        error,
+      } = await supabase
+        .from("products")
+        .select("*");
 
       if (error) {
         console.log(error);
@@ -55,18 +57,18 @@ export default function ProductsPage() {
   return (
     <main className="min-h-screen bg-blue-50 p-10">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-5xl font-bold text-blue-700 mb-10">
-          Productos
+        <h1 className="text-5xl font-bold text-blue-700 mb-10 text-center">
+          Nuestros Productos
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {products.map(
             (
               product: Product
             ) => (
               <div
                 key={product.id}
-                className="bg-white rounded-3xl shadow-xl overflow-hidden"
+                className="bg-white rounded-3xl shadow-xl overflow-hidden hover:scale-105 transition duration-300"
               >
                 <Image
                   src={
@@ -81,13 +83,13 @@ export default function ProductsPage() {
                 />
 
                 <div className="p-6">
-                  <h2 className="text-2xl font-bold mb-3">
+                  <h2 className="text-3xl font-bold text-blue-700 mb-3">
                     {
                       product.title
                     }
                   </h2>
 
-                  <p className="text-xl text-gray-600 mb-5">
+                  <p className="text-2xl text-gray-700 mb-6">
                     $
                     {
                       product.price
@@ -100,7 +102,7 @@ export default function ProductsPage() {
                         product
                       )
                     }
-                    className="bg-blue-700 text-white w-full py-4 rounded-xl text-lg hover:bg-blue-800 transition"
+                    className="bg-blue-700 text-white w-full py-4 rounded-2xl text-lg font-bold hover:bg-blue-800 transition"
                   >
                     Agregar al Carrito
                   </button>

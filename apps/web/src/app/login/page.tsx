@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useState,
+} from "react";
 
 import { supabase } from "@/lib/supabase";
 
@@ -8,19 +10,25 @@ export default function LoginPage() {
   const [email, setEmail] =
     useState("");
 
-  const [password, setPassword] =
-    useState("");
+  const [
+    password,
+    setPassword,
+  ] = useState("");
 
   const handleLogin =
-    async () => {
+    async (): Promise<void> => {
       const { error } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        await supabase.auth.signInWithPassword(
+          {
+            email,
+            password,
+          }
+        );
 
       if (error) {
-        alert(error.message);
+        alert(
+          error.message
+        );
         return;
       }
 
@@ -29,38 +37,50 @@ export default function LoginPage() {
     };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-700 to-blue-400">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md">
-        <h1 className="text-4xl font-bold text-center text-blue-700 mb-8">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-700 to-blue-400 p-5">
+      <div className="bg-white w-full max-w-md p-10 rounded-3xl shadow-2xl">
+        <h1 className="text-5xl font-bold text-center text-blue-700 mb-3">
           DigitalMarket
         </h1>
 
-        <input
-          type="email"
-          placeholder="Correo"
-          value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
-          className="border p-4 rounded-xl w-full mb-5"
-        />
+        <p className="text-center text-gray-600 mb-10">
+          Inicia sesión para continuar
+        </p>
 
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          className="border p-4 rounded-xl w-full mb-6"
-        />
+        <div className="flex flex-col gap-5">
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) =>
+              setEmail(
+                e.target.value
+              )
+            }
+            className="border border-gray-300 p-4 rounded-2xl outline-none focus:border-blue-700"
+          />
 
-        <button
-          onClick={handleLogin}
-          className="bg-blue-700 text-white w-full py-4 rounded-xl"
-        >
-          Iniciar Sesión
-        </button>
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+            className="border border-gray-300 p-4 rounded-2xl outline-none focus:border-blue-700"
+          />
+
+          <button
+            onClick={
+              handleLogin
+            }
+            className="bg-blue-700 text-white py-4 rounded-2xl text-lg font-bold hover:bg-blue-800 transition"
+          >
+            Iniciar Sesión
+          </button>
+        </div>
       </div>
     </main>
   );
