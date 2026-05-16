@@ -9,21 +9,41 @@ export default function Navbar() {
     useCart();
 
   return (
-    <nav className="flex items-center justify-between p-5 border-b">
+    <nav className="bg-blue-700 text-white px-10 py-5 flex justify-between items-center shadow-lg">
+      {/* Logo */}
       <Link
-        href="/products"
-        className="text-2xl font-bold"
+        href="/"
+        className="text-3xl font-bold"
       >
         DigitalMarket
       </Link>
 
-      <Link
-        href="/cart"
-        className="text-xl"
-      >
-        Cart (
-        {cart.length})
-      </Link>
+      {/* Menu */}
+      <div className="flex gap-8 text-lg items-center">
+        <Link href="/">
+          Inicio
+        </Link>
+
+        <Link href="/products">
+          Productos
+        </Link>
+
+        <Link href="/dashboard">
+          Dashboard
+        </Link>
+
+        <Link href="/cart">
+          🛒 Carrito (
+          {cart.length})
+        </Link>
+
+        <Link
+          href="/login"
+          className="bg-white text-blue-700 px-5 py-2 rounded-xl font-bold"
+        >
+          Login
+        </Link>
+      </div>
     </nav>
   );
 }
