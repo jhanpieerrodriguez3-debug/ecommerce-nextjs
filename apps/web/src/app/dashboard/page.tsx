@@ -97,12 +97,16 @@ export default function DashboardPage() {
               Ver Productos
             </a>
 
-            <a
-              href="/cart"
-              className="border border-cyan-400 px-8 py-4 rounded-2xl font-bold hover:bg-cyan-400 hover:text-black transition"
-            >
-              Mi Carrito
-            </a>
+            
+{profile?.role ===
+  "client" && (
+  <a
+    href="/cart"
+    className="border border-cyan-400 px-8 py-4 rounded-2xl font-bold hover:bg-cyan-400 hover:text-black transition"
+  >
+    Mi Carrito
+  </a>
+)}
 
             <button
               onClick={
