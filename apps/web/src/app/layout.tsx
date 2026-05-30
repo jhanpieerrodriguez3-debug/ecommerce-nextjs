@@ -8,6 +8,7 @@ import {
 import "./globals.css";
 
 import { CartProvider } from "@/context/CartContext";
+import { ToastProvider } from "@/context/ToastContext";
 
 import Navbar from "@/components/Navbar";
 
@@ -27,9 +28,9 @@ const geistMono =
 export const metadata:
   Metadata = {
     title:
-      "DigitalMarket",
+      "DigitalMarket - SaaS para Almacenes",
     description:
-      "Marketplace App",
+      "Plataforma inteligente de administración y ventas para almacenes de barrio",
   };
 
 export default function RootLayout({
@@ -39,16 +40,18 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <CartProvider>
-          <Navbar />
+      <body className="min-h-full flex flex-col bg-[#030712]">
+        <ToastProvider>
+          <CartProvider>
+            <Navbar />
 
-          {children}
-        </CartProvider>
+            {children}
+          </CartProvider>
+        </ToastProvider>
       </body>
     </html>
   );
-}
+}
