@@ -6,261 +6,215 @@ import {
 } from "react";
 
 import {
-  useRouter,
-} from "next/navigation";
-
-import {
   CreditCard,
-  CheckCircle2,
-  Smartphone,
-  Wallet,
+  Lock,
+  User,
+  Mail,
+  MapPin,
 } from "lucide-react";
 
-import { useCart } from "@/context/CartContext";
-
 export default function CheckoutPage() {
-  const router =
-    useRouter();
-
-  const {
-    cart,
-    clearCart,
-  } = useCart();
-
-  const [loading, setLoading] =
-    useState(false);
-
   const [
-    paymentMethod,
-    setPaymentMethod,
-  ] = useState("Tarjeta");
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  const total =
-    cart.reduce(
-      (
-        acc,
-        item
-      ) =>
-        acc +
-        item.price *
-          item.quantity,
-      0
-    );
-
-  const handleCheckout =
+  const handlePayment =
     async () => {
       setLoading(true);
 
       setTimeout(() => {
-        clearCart();
+        setLoading(false);
 
-        router.push(
-          "/success"
+        alert(
+          "✅ Pago realizado correctamente"
         );
       }, 2500);
     };
 
   return (
-    <main className="min-h-screen bg-[#030712] text-white relative overflow-hidden">
-      {/* EFFECTS */}
-      <div className="absolute w-[500px] h-[500px] bg-cyan-500/20 blur-[140px] rounded-full top-[-150px] left-[-150px]" />
+    <main className="min-h-screen bg-[#050816] text-white p-10 relative overflow-hidden">
+      {/* GLOW */}
+      <div className="absolute w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full top-[-100px] left-[-100px]" />
 
-      <div className="absolute w-[500px] h-[500px] bg-blue-600/20 blur-[140px] rounded-full bottom-[-150px] right-[-150px]" />
+      <div className="absolute w-[400px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full bottom-[-100px] right-[-100px]" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 grid lg:grid-cols-2 gap-10">
-        {/* FORM */}
-        <div className="bg-white/5 border border-white/10 backdrop-blur-2xl rounded-[40px] p-10 shadow-[0_0_40px_rgba(34,211,238,0.08)]">
-          <h1 className="text-5xl font-black mb-10">
-            Checkout
+      <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-10">
+        {/* LEFT */}
+        <div className="bg-white/10 border border-white/10 backdrop-blur-2xl rounded-[40px] p-10 shadow-[0_0_40px_rgba(34,211,238,0.15)]">
+          <h1 className="text-5xl font-black mb-4">
+            💳 Checkout
           </h1>
 
-          {/* INPUTS */}
-          <div className="space-y-6">
-            <input
-              type="text"
-              placeholder="Nombre completo"
-              className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 outline-none focus:border-cyan-400 transition"
-            />
+          <p className="text-gray-400 mb-10">
+            Completa tu información de pago
+          </p>
 
-            <input
-              type="text"
-              placeholder="Dirección"
-              className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 outline-none focus:border-cyan-400 transition"
-            />
+          {/* NAME */}
+          <div className="mb-6">
+            <label className="block mb-3 font-bold">
+              Nombre completo
+            </label>
 
-            <input
-              type="text"
-              placeholder="Teléfono"
-              className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 outline-none focus:border-cyan-400 transition"
-            />
-          </div>
+            <div className="flex items-center bg-black/30 border border-cyan-400/20 rounded-2xl px-4">
+              <User className="text-cyan-400" />
 
-          {/* PAYMENT */}
-          <div className="mt-10">
-            <h2 className="text-3xl font-black mb-6">
-              Método de pago
-            </h2>
-
-            <div className="space-y-5">
-              {/* CARD */}
-              <button
-                onClick={() =>
-                  setPaymentMethod(
-                    "Tarjeta"
-                  )
-                }
-                className={`w-full p-6 rounded-3xl border flex items-center gap-5 transition ${
-                  paymentMethod ===
-                  "Tarjeta"
-                    ? "border-cyan-400 bg-cyan-500/20 shadow-[0_0_30px_rgba(34,211,238,0.2)]"
-                    : "border-white/10 bg-white/5"
-                }`}
-              >
-                <CreditCard size={35} />
-
-                <div className="text-left">
-                  <h3 className="text-2xl font-bold">
-                    Tarjeta
-                  </h3>
-
-                  <p className="text-gray-400">
-                    Visa / Mastercard
-                  </p>
-                </div>
-              </button>
-
-              {/* PAYPAL */}
-              <button
-                onClick={() =>
-                  setPaymentMethod(
-                    "PayPal"
-                  )
-                }
-                className={`w-full p-6 rounded-3xl border flex items-center gap-5 transition ${
-                  paymentMethod ===
-                  "PayPal"
-                    ? "border-cyan-400 bg-cyan-500/20 shadow-[0_0_30px_rgba(34,211,238,0.2)]"
-                    : "border-white/10 bg-white/5"
-                }`}
-              >
-                <Wallet size={35} />
-
-                <div className="text-left">
-                  <h3 className="text-2xl font-bold">
-                    PayPal
-                  </h3>
-
-                  <p className="text-gray-400">
-                    Pago rápido online
-                  </p>
-                </div>
-              </button>
-
-              {/* YAPE */}
-              <button
-                onClick={() =>
-                  setPaymentMethod(
-                    "Yape"
-                  )
-                }
-                className={`w-full p-6 rounded-3xl border flex items-center gap-5 transition ${
-                  paymentMethod ===
-                  "Yape"
-                    ? "border-cyan-400 bg-cyan-500/20 shadow-[0_0_30px_rgba(34,211,238,0.2)]"
-                    : "border-white/10 bg-white/5"
-                }`}
-              >
-                <Smartphone size={35} />
-
-                <div className="text-left">
-                  <h3 className="text-2xl font-bold">
-                    Yape
-                  </h3>
-
-                  <p className="text-gray-400">
-                    Pago móvil
-                  </p>
-                </div>
-              </button>
+              <input
+                type="text"
+                placeholder="Juan Pérez"
+                className="w-full bg-transparent p-4 outline-none"
+              />
             </div>
           </div>
-        </div>
 
-        {/* SUMMARY */}
-        <div className="bg-white/5 border border-white/10 backdrop-blur-2xl rounded-[40px] p-10 shadow-[0_0_40px_rgba(34,211,238,0.08)] h-fit">
-          <h2 className="text-4xl font-black mb-10">
-            Resumen
-          </h2>
+          {/* EMAIL */}
+          <div className="mb-6">
+            <label className="block mb-3 font-bold">
+              Correo
+            </label>
 
-          <div className="space-y-5">
-            {cart.map(
-              (
-                item
-              ) => (
-                <div
-                  key={
-                    item.id
-                  }
-                  className="flex justify-between items-center border-b border-white/10 pb-5"
-                >
-                  <div>
-                    <h3 className="text-2xl font-bold">
-                      {
-                        item.title
-                      }
-                    </h3>
+            <div className="flex items-center bg-black/30 border border-cyan-400/20 rounded-2xl px-4">
+              <Mail className="text-cyan-400" />
 
-                    <p className="text-gray-400">
-                      x
-                      {
-                        item.quantity
-                      }
-                    </p>
-                  </div>
-
-                  <p className="text-cyan-400 text-2xl font-black">
-                    $
-                    {item.price *
-                      item.quantity}
-                  </p>
-                </div>
-              )
-            )}
+              <input
+                type="email"
+                placeholder="correo@gmail.com"
+                className="w-full bg-transparent p-4 outline-none"
+              />
+            </div>
           </div>
 
-          {/* TOTAL */}
-          <div className="flex justify-between items-center mt-10">
-            <span className="text-3xl font-black">
-              Total
-            </span>
+          {/* ADDRESS */}
+          <div className="mb-6">
+            <label className="block mb-3 font-bold">
+              Dirección
+            </label>
 
-            <span className="text-5xl font-black text-cyan-400">
-              ${total}
-            </span>
+            <div className="flex items-center bg-black/30 border border-cyan-400/20 rounded-2xl px-4">
+              <MapPin className="text-cyan-400" />
+
+              <input
+                type="text"
+                placeholder="Av. Principal 123"
+                className="w-full bg-transparent p-4 outline-none"
+              />
+            </div>
+          </div>
+
+          {/* CARD */}
+          <div className="mb-6">
+            <label className="block mb-3 font-bold">
+              Número de tarjeta
+            </label>
+
+            <div className="flex items-center bg-black/30 border border-cyan-400/20 rounded-2xl px-4">
+              <CreditCard className="text-cyan-400" />
+
+              <input
+                type="text"
+                placeholder="1234 5678 9012 3456"
+                className="w-full bg-transparent p-4 outline-none"
+              />
+            </div>
+          </div>
+
+          {/* ROW */}
+          <div className="grid grid-cols-2 gap-5 mb-8">
+            {/* DATE */}
+            <div>
+              <label className="block mb-3 font-bold">
+                Expiración
+              </label>
+
+              <input
+                type="text"
+                placeholder="MM/YY"
+                className="w-full bg-black/30 border border-cyan-400/20 rounded-2xl p-4 outline-none"
+              />
+            </div>
+
+            {/* CVV */}
+            <div>
+              <label className="block mb-3 font-bold">
+                CVV
+              </label>
+
+              <input
+                type="password"
+                placeholder="123"
+                className="w-full bg-black/30 border border-cyan-400/20 rounded-2xl p-4 outline-none"
+              />
+            </div>
           </div>
 
           {/* BUTTON */}
           <button
             onClick={
-              handleCheckout
+              handlePayment
             }
-            disabled={loading}
-            className="w-full mt-10 bg-gradient-to-r from-cyan-400 to-blue-600 py-6 rounded-3xl text-2xl font-black shadow-[0_0_40px_rgba(34,211,238,0.5)] hover:scale-105 transition duration-300 flex items-center justify-center gap-4"
+            disabled={
+              loading
+            }
+            className="w-full bg-gradient-to-r from-cyan-400 to-blue-600 py-5 rounded-2xl text-xl font-black shadow-[0_0_30px_rgba(34,211,238,0.5)] hover:scale-105 transition duration-300"
           >
-            {loading ? (
-              <>
-                <div className="w-7 h-7 border-4 border-white border-t-transparent rounded-full animate-spin" />
-
-                Procesando...
-              </>
-            ) : (
-              <>
-                <CheckCircle2 />
-
-                Confirmar compra
-              </>
-            )}
+            {loading
+              ? "Procesando pago..."
+              : "Pagar ahora"}
           </button>
+        </div>
+
+        {/* RIGHT */}
+        <div className="bg-white/10 border border-white/10 backdrop-blur-2xl rounded-[40px] p-10 shadow-[0_0_40px_rgba(59,130,246,0.15)]">
+          <h2 className="text-4xl font-black mb-8">
+            🛍️ Resumen
+          </h2>
+
+          <div className="space-y-5 mb-10">
+            <div className="flex justify-between">
+              <span className="text-gray-400">
+                Subtotal
+              </span>
+
+              <span className="font-bold">
+                $120
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-gray-400">
+                Envío
+              </span>
+
+              <span className="font-bold">
+                $10
+              </span>
+            </div>
+
+            <div className="border-t border-white/10 pt-5 flex justify-between text-2xl font-black">
+              <span>Total</span>
+
+              <span className="text-cyan-400">
+                $130
+              </span>
+            </div>
+          </div>
+
+          {/* SECURITY */}
+          <div className="bg-black/30 rounded-3xl p-6 flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 flex items-center justify-center">
+              <Lock className="text-cyan-400" />
+            </div>
+
+            <div>
+              <h3 className="font-bold text-xl">
+                Pago seguro
+              </h3>
+
+              <p className="text-gray-400 text-sm">
+                Tus datos están protegidos
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </main>

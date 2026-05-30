@@ -11,6 +11,8 @@ import {
   ShoppingBag,
 } from "lucide-react";
 
+import { useState } from "react";
+
 import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
@@ -21,6 +23,31 @@ export default function CartPage() {
     decreaseQuantity,
     clearCart,
   } = useCart();
+
+  const [
+    showCheckout,
+    setShowCheckout,
+  ] = useState(false);
+
+  const [name, setName] =
+    useState("");
+
+  const [email, setEmail] =
+    useState("");
+
+  const [address, setAddress] =
+    useState("");
+
+  const [
+    cardNumber,
+    setCardNumber,
+  ] = useState("");
+
+  const [expiry, setExpiry] =
+    useState("");
+
+  const [cvv, setCvv] =
+    useState("");
 
   const total =
     cart.reduce(
@@ -36,7 +63,7 @@ export default function CartPage() {
 
   return (
     <main className="min-h-screen bg-[#030712] text-white relative overflow-hidden">
-      {/* BACKGROUND EFFECTS */}
+      {/* BACKGROUND */}
       <div className="absolute w-[500px] h-[500px] bg-cyan-500/20 blur-[140px] rounded-full top-[-150px] left-[-150px]" />
 
       <div className="absolute w-[500px] h-[500px] bg-blue-600/20 blur-[140px] rounded-full bottom-[-150px] right-[-150px]" />
@@ -190,7 +217,7 @@ export default function CartPage() {
                 </span>
               </div>
 
-              {/* PAYMENT METHODS */}
+              {/* PAYMENT */}
               <div className="space-y-5 mb-10">
                 <h3 className="text-2xl font-bold mb-4">
                   Método de pago
@@ -201,19 +228,18 @@ export default function CartPage() {
 
                   Tarjeta
                 </button>
-
-                <button className="w-full bg-black/40 border border-cyan-500/20 hover:border-cyan-400 py-5 rounded-2xl transition">
-                  💳 PayPal
-                </button>
-
-                <button className="w-full bg-black/40 border border-cyan-500/20 hover:border-cyan-400 py-5 rounded-2xl transition">
-                  📱 Yape
-                </button>
               </div>
 
               {/* ACTIONS */}
               <div className="space-y-5">
-                <button className="w-full bg-gradient-to-r from-cyan-400 to-blue-600 py-5 rounded-2xl text-xl font-black shadow-[0_0_30px_rgba(34,211,238,0.5)] hover:scale-105 transition duration-300">
+                <button
+                  onClick={() =>
+                    setShowCheckout(
+                      true
+                    )
+                  }
+                  className="w-full bg-gradient-to-r from-cyan-400 to-blue-600 py-5 rounded-2xl text-xl font-black shadow-[0_0_30px_rgba(34,211,238,0.5)] hover:scale-105 transition duration-300"
+                >
                   Proceder al pago
                 </button>
 
@@ -230,6 +256,150 @@ export default function CartPage() {
           )}
         </div>
       </div>
+
+      {/* CHECKOUT MODAL */}
+      {showCheckout && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-5">
+          <div className="w-full max-w-2xl bg-[#111827] border border-cyan-500/20 rounded-[35px] p-10 shadow-[0_0_60px_rgba(34,211,238,0.2)] relative overflow-hidden">
+
+            {/* GLOW */}
+            <div className="absolute w-[300px] h-[300px] bg-cyan-500/10 blur-[120px] rounded-full top-[-100px] right-[-100px]" />
+
+            <div className="relative z-10">
+              <h2 className="text-5xl font-black text-white mb-3">
+                💳 Checkout
+              </h2>
+
+              <p className="text-gray-400 mb-10">
+                Completa los datos de tu tarjeta
+              </p>
+
+              {/* INPUTS */}
+              <div className="space-y-5">
+
+                <input
+                  type="text"
+                  placeholder="Nombre completo"
+                  value={name}
+                  onChange={(e) =>
+                    setName(
+                      e.target.value
+                    )
+                  }
+                  className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 text-white outline-none focus:border-cyan-400"
+                />
+
+                <input
+                  type="email"
+                  placeholder="Correo electrónico"
+                  value={email}
+                  onChange={(e) =>
+                    setEmail(
+                      e.target.value
+                    )
+                  }
+                  className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 text-white outline-none focus:border-cyan-400"
+                />
+
+                <input
+                  type="text"
+                  placeholder="Dirección de envío"
+                  value={address}
+                  onChange={(e) =>
+                    setAddress(
+                      e.target.value
+                    )
+                  }
+                  className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 text-white outline-none focus:border-cyan-400"
+                />
+
+                <input
+                  type="text"
+                  placeholder="Número de tarjeta"
+                  value={
+                    cardNumber
+                  }
+                  onChange={(e) =>
+                    setCardNumber(
+                      e.target.value
+                    )
+                  }
+                  className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 text-white outline-none focus:border-cyan-400"
+                />
+
+                <div className="grid grid-cols-2 gap-5">
+                  <input
+                    type="text"
+                    placeholder="MM/YY"
+                    value={expiry}
+                    onChange={(e) =>
+                      setExpiry(
+                        e.target.value
+                      )
+                    }
+                    className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 text-white outline-none focus:border-cyan-400"
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="CVV"
+                    value={cvv}
+                    onChange={(e) =>
+                      setCvv(
+                        e.target.value
+                      )
+                    }
+                    className="w-full bg-black/30 border border-cyan-500/20 rounded-2xl p-5 text-white outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+
+              {/* TOTAL */}
+              <div className="mt-10 bg-black/30 rounded-2xl p-6 border border-cyan-500/10">
+                <p className="text-gray-400 text-lg">
+                  Total a pagar
+                </p>
+
+                <h3 className="text-5xl font-black text-cyan-400 mt-2">
+                  ${total}
+                </h3>
+              </div>
+
+              {/* BUTTONS */}
+              <div className="flex gap-5 mt-10">
+                <button
+                  onClick={() => {
+                    alert(
+                      "✅ Pago realizado correctamente"
+                    );
+
+                    clearCart();
+
+                    setShowCheckout(
+                      false
+                    );
+                  }}
+                  className="flex-1 bg-gradient-to-r from-cyan-400 to-blue-600 py-5 rounded-2xl text-xl font-black hover:scale-105 transition duration-300"
+                >
+                  Pagar ahora
+                </button>
+
+                <button
+                  onClick={() =>
+                    setShowCheckout(
+                      false
+                    )
+                  }
+                  className="px-8 bg-red-600 hover:bg-red-700 rounded-2xl font-bold transition"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
+
