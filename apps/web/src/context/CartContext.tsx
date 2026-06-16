@@ -9,6 +9,7 @@ import {
 
 type CartProduct = {
   id: number;
+  store_id: number;
   title: string;
   price: number;
   image: string;

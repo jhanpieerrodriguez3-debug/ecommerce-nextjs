@@ -26,6 +26,10 @@ export default function CheckoutPage() {
   const [cvv, setCvv] = useState("");
   const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
 
+  // Selección de tipo de entrega y método de pago
+  const [deliveryType, setDeliveryType] = useState<"delivery" | "pickup">("delivery");
+  const [paymentMethod, setPaymentMethod] = useState<"online" | "tienda">("online");
+
   const [loading, setLoading] = useState(false);
   const [successOrder, setSuccessOrder] = useState<Order | null>(null);
 
@@ -55,15 +59,25 @@ export default function CheckoutPage() {
     e.preventDefault();
     if (!profile || cart.length === 0) return;
 
-    if (!name || !email || !address || !cardNumber || !expiry || !cvv) {
-      showToast("Por favor, completa toda la información de pago y despacho", "error");
+    if (!name || !email) {
+      showToast("Por favor, ingresa tu nombre y correo", "error");
+      return;
+    }
+
+    if (deliveryType === "delivery" && !address) {
+      showToast("Por favor, ingresa tu dirección de despacho", "error");
+      return;
+    }
+
+    if (paymentMethod === "online" && (!cardNumber || !expiry || !cvv)) {
+      showToast("Por favor, completa la información de pago con tarjeta", "error");
       return;
     }
 
     setLoading(true);
 
-    // Determinar la tienda asociada (asumimos la tienda del primer item del carro, o 1 por defecto)
-    const storeId = 1; 
+    // Determinar la tienda asociada
+    const storeId = cart[0]?.store_id || 1; 
 
     const orderItems = cart.map((item) => ({
       id: item.id,
@@ -73,6 +87,10 @@ export default function CheckoutPage() {
       image: item.image
     }));
 
+    const finalAddressText = deliveryType === "pickup" ? "Retiro en Almacén" : address;
+    const finalBillingText = paymentMethod === "online" ? "Pago Online" : "Pagar en Tienda";
+    const orderAddress = `${finalAddressText} (${finalBillingText})`;
+
     setTimeout(async () => {
       try {
         // Crear orden comercial real en dbService
@@ -81,16 +99,21 @@ export default function CheckoutPage() {
           user_id: profile.id,
           customer_name: name,
           customer_email: email,
-          address: address,
+          address: orderAddress,
           items: orderItems,
           total: cartTotal
         });
 
         setSuccessOrder(createdOrder);
         clearCart();
-        showToast("¡Transacción autorizada y pedido registrado!", "success");
+        showToast(
+          paymentMethod === "online" 
+            ? "¡Transacción autorizada y pedido registrado!" 
+            : "¡Pedido registrado exitosamente para pagar en tienda!", 
+          "success"
+        );
       } catch (err) {
-        showToast("Ocurrió un error al procesar el cobro", "error");
+        showToast("Ocurrió un error al procesar el pedido", "error");
       } finally {
         setLoading(false);
       }
@@ -119,7 +142,7 @@ export default function CheckoutPage() {
           </div>
           
           <div className="space-y-2">
-            <h1 className="text-4xl font-black text-white">¡Transacción Exitosa!</h1>
+            <h1 className="text-4xl font-black text-white">¡Pedido Confirmado!</h1>
             <p className="text-gray-400 text-sm">Tu pedido ha sido enviado al almacén para su preparación inmediata.</p>
           </div>
 
@@ -141,12 +164,16 @@ export default function CheckoutPage() {
             </div>
 
             <div className="border-t border-white/5 pt-3 space-y-1.5 text-gray-300">
-              <p>📍 <strong className="text-white">Dirección de Despacho:</strong> {successOrder.address}</p>
+              <p>📍 <strong className="text-white">Opción / Dirección:</strong> {successOrder.address}</p>
               <p>📧 <strong className="text-white">Correo Confirmación:</strong> {successOrder.customer_email}</p>
             </div>
 
             <div className="border-t border-white/5 pt-3 flex justify-between items-center text-sm">
-              <span className="text-white font-bold">Total Cargado a Tarjeta:</span>
+              <span className="text-white font-bold">
+                {successOrder.address.includes("Pagar en Tienda") || successOrder.address.includes("Pagar al Recibir") 
+                  ? "Monto a Pagar al Recibir:" 
+                  : "Total Cargado a Tarjeta:"}
+              </span>
               <span className="text-lg font-black text-cyan-400">${successOrder.total.toLocaleString("es-CL")}</span>
             </div>
           </div>
@@ -199,30 +226,84 @@ export default function CheckoutPage() {
             {/* IZQUIERDA: FORMULARIO DE PAGO Y DIRECCIÓN (3/5 de ancho) */}
             <form onSubmit={handlePayment} className="lg:col-span-3 bg-white/5 border border-white/10 backdrop-blur-2xl rounded-[35px] p-6 md:p-8 shadow-[0_0_40px_rgba(34,211,238,0.08)] space-y-6">
               <div>
-                <h1 className="text-3xl md:text-4xl font-black mb-2">💳 Facturación y Despacho</h1>
-                <p className="text-gray-400 text-sm">Completa tus datos de pago seguro y envío local</p>
+                <h1 className="text-3xl md:text-4xl font-black mb-2">🏪 Despacho y Pago</h1>
+                <p className="text-gray-400 text-sm">Elige tu forma de entrega y método de pago preferido</p>
               </div>
 
-              {/* SAVED ADDRESSES SELECTOR */}
-              {savedAddresses.length > 0 && (
+              {/* TIPO DE ENTREGA Y METODO DE PAGO SELECTORS */}
+              <div className="grid sm:grid-cols-2 gap-4 bg-white/5 border border-white/5 p-4 rounded-2xl">
+                {/* TIPO DE ENTREGA */}
                 <div className="space-y-2">
-                  <label className="block text-gray-400 text-xs font-semibold">📍 Selecciona Dirección Guardada:</label>
-                  <div className="flex flex-wrap gap-2">
-                    {savedAddresses.map((addr) => (
-                      <button
-                        key={addr.id}
-                        type="button"
-                        onClick={() => handleSelectSavedAddress(addr.address)}
-                        className={`text-xs px-3.5 py-2 rounded-xl border font-semibold transition cursor-pointer ${
-                          address === addr.address ? "border-cyan-400 bg-cyan-400/10 text-white" : "border-white/10 text-gray-400 hover:border-cyan-400/30"
-                        }`}
-                      >
-                        {addr.full_name} ({addr.city})
-                      </button>
-                    ))}
+                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">Tipo de Entrega</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeliveryType("delivery");
+                        if (savedAddresses.length > 0) {
+                          setAddress(savedAddresses[0].address);
+                        } else {
+                          setAddress("");
+                        }
+                      }}
+                      className={`py-3 rounded-xl border text-xs font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
+                        deliveryType === "delivery"
+                          ? "border-cyan-400 bg-cyan-400/10 text-white"
+                          : "border-white/10 text-gray-400 hover:border-white/20"
+                      }`}
+                    >
+                      <span className="text-lg">🚚</span>
+                      <span>Despacho</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeliveryType("pickup");
+                        setAddress("Retiro en Almacén");
+                      }}
+                      className={`py-3 rounded-xl border text-xs font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
+                        deliveryType === "pickup"
+                          ? "border-cyan-400 bg-cyan-400/10 text-white"
+                          : "border-white/10 text-gray-400 hover:border-white/20"
+                      }`}
+                    >
+                      <span className="text-lg">🏪</span>
+                      <span>Retiro</span>
+                    </button>
                   </div>
                 </div>
-              )}
+
+                {/* METODO DE PAGO */}
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">Método de Pago</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("online")}
+                      className={`py-3 rounded-xl border text-xs font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
+                        paymentMethod === "online"
+                          ? "border-cyan-400 bg-cyan-400/10 text-white"
+                          : "border-white/10 text-gray-400 hover:border-white/20"
+                      }`}
+                    >
+                      <span className="text-lg">💳</span>
+                      <span>Pago Online</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("tienda")}
+                      className={`py-3 rounded-xl border text-xs font-bold transition flex flex-col items-center gap-1 cursor-pointer ${
+                        paymentMethod === "tienda"
+                          ? "border-cyan-400 bg-cyan-400/10 text-white"
+                          : "border-white/10 text-gray-400 hover:border-white/20"
+                      }`}
+                    >
+                      <span className="text-lg">💵</span>
+                      <span>En Tienda</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
 
               {/* NAME */}
               <div className="space-y-2">
@@ -256,64 +337,94 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* ADDRESS */}
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-gray-300">Dirección de Despacho Local</label>
-                <div className="flex items-center bg-black/40 border border-cyan-400/20 rounded-xl px-4">
-                  <MapPin size={18} className="text-cyan-400" />
-                  <input
-                    type="text"
-                    placeholder="Ej: Av. Las Condes 8900, Santiago"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full bg-transparent p-3 text-sm outline-none text-white"
-                    required
-                  />
-                </div>
-              </div>
+              {/* ADDRESS & SAVED ADDRESSES (Conditional) */}
+              {deliveryType === "delivery" && (
+                <>
+                  {/* SAVED ADDRESSES SELECTOR */}
+                  {savedAddresses.length > 0 && (
+                    <div className="space-y-2">
+                      <label className="block text-gray-400 text-xs font-semibold">📍 Selecciona Dirección Guardada:</label>
+                      <div className="flex flex-wrap gap-2">
+                        {savedAddresses.map((addr) => (
+                          <button
+                            key={addr.id}
+                            type="button"
+                            onClick={() => handleSelectSavedAddress(addr.address)}
+                            className={`text-xs px-3.5 py-2 rounded-xl border font-semibold transition cursor-pointer ${
+                              address === addr.address ? "border-cyan-400 bg-cyan-400/10 text-white" : "border-white/10 text-gray-400 hover:border-cyan-400/30"
+                            }`}
+                          >
+                            {addr.full_name} ({addr.city})
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              {/* CARD DETAILS */}
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-gray-300">Número de Tarjeta de Crédito/Débito</label>
-                <div className="flex items-center bg-black/40 border border-cyan-400/20 rounded-xl px-4">
-                  <CreditCard size={18} className="text-cyan-400" />
-                  <input
-                    type="text"
-                    placeholder="1234 5678 9012 3456"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    className="w-full bg-transparent p-3 text-sm outline-none text-white font-mono"
-                    required
-                  />
-                </div>
-              </div>
+                  {/* ADDRESS INPUT */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-gray-300">Dirección de Despacho Local</label>
+                    <div className="flex items-center bg-black/40 border border-cyan-400/20 rounded-xl px-4">
+                      <MapPin size={18} className="text-cyan-400" />
+                      <input
+                        type="text"
+                        placeholder="Ej: Av. Las Condes 8900, Santiago"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full bg-transparent p-3 text-sm outline-none text-white"
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
-              <div className="grid grid-cols-2 gap-4">
-                {/* DATE */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-gray-300">Expiración</label>
-                  <input
-                    type="text"
-                    placeholder="MM/YY"
-                    value={expiry}
-                    onChange={(e) => setExpiry(e.target.value)}
-                    className="w-full bg-black/40 border border-cyan-400/20 rounded-xl p-3 text-sm outline-none text-white text-center"
-                    required
-                  />
-                </div>
-                {/* CVV */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-gray-300">CVV</label>
-                  <input
-                    type="password"
-                    placeholder="•••"
-                    value={cvv}
-                    onChange={(e) => setCvv(e.target.value)}
-                    className="w-full bg-black/40 border border-cyan-400/20 rounded-xl p-3 text-sm outline-none text-white text-center"
-                    required
-                  />
-                </div>
-              </div>
+              {/* CARD DETAILS (Conditional) */}
+              {paymentMethod === "online" && (
+                <>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-gray-300">Número de Tarjeta de Crédito/Débito</label>
+                    <div className="flex items-center bg-black/40 border border-cyan-400/20 rounded-xl px-4">
+                      <CreditCard size={18} className="text-cyan-400" />
+                      <input
+                        type="text"
+                        placeholder="1234 5678 9012 3456"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                        className="w-full bg-transparent p-3 text-sm outline-none text-white font-mono"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* DATE */}
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">Expiración</label>
+                      <input
+                        type="text"
+                        placeholder="MM/YY"
+                        value={expiry}
+                        onChange={(e) => setExpiry(e.target.value)}
+                        className="w-full bg-black/40 border border-cyan-400/20 rounded-xl p-3 text-sm outline-none text-white text-center"
+                        required
+                      />
+                    </div>
+                    {/* CVV */}
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold text-gray-300">CVV</label>
+                      <input
+                        type="password"
+                        placeholder="•••"
+                        value={cvv}
+                        onChange={(e) => setCvv(e.target.value)}
+                        className="w-full bg-black/40 border border-cyan-400/20 rounded-xl p-3 text-sm outline-none text-white text-center"
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* BUTTON */}
               <button
@@ -324,10 +435,10 @@ export default function CheckoutPage() {
                 {loading ? (
                   <>
                     <span className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
-                    Autorizando transacciones bancarias...
+                    {paymentMethod === "online" ? "Autorizando transacciones bancarias..." : "Confirmando pedido comercial..."}
                   </>
                 ) : (
-                  "Autorizar Pago y Registrar Pedido ✓"
+                  paymentMethod === "online" ? "Autorizar Pago y Registrar Pedido ✓" : "Confirmar Pedido (Pagar en Almacén) ✓"
                 )}
               </button>
             </form>

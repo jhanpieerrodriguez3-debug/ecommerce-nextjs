@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/context/ToastContext";
-import { dbService } from "@/lib/dbService";
+import { dbService, UserRole } from "@/lib/dbService";
+import { ROLE_HOME } from "@/hooks/useAuthGuard";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,129 +19,113 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      showToast("Ingresa tu correo y contraseña comercial", "error");
+      showToast("Ingresa tu correo y contraseña", "error");
       return;
     }
 
     setLoading(true);
 
-    // ==========================================
-    // ANCLAJE DE MOCK ACCOUNTS EXTREMADAMENTE ÚTILES PARA LA DEFENSA
-    // ==========================================
-    if (password === "123456") {
-      if (email === "admin@test.com") {
-        const mockAdminProfile = {
-          id: "mock-admin-id",
-          email: "admin@test.com",
-          role: "admin" as const,
-          full_name: "Gonzalo Valenzuela (Don Tito)",
-          store_id: 1
-        };
-        dbService.setCurrentProfile(mockAdminProfile);
-        showToast("¡Acceso concedido! Bienvenido al Panel de Administración", "success");
-        setTimeout(() => router.push("/admin"), 1200);
-        setLoading(false);
-        return;
+    try {
+      // PASO 1: Intentar autenticar por BFF/users-service
+      const bffUrl = process.env.NEXT_PUBLIC_BFF_URL || "http://localhost:4000";
+      const bffRes = await fetch(`${bffUrl}/api/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (bffRes.ok) {
+        const bffData = await bffRes.json();
+        if (bffData.success && bffData.profile) {
+          if (bffData.token) localStorage.setItem("digitalmarket_token", bffData.token);
+          const activeProfile = {
+            id: bffData.profile.id,
+            email: bffData.profile.email,
+            role: bffData.profile.role as UserRole,
+            full_name: bffData.profile.full_name,
+            store_id: bffData.profile.store_id ?? undefined,
+          };
+          dbService.setCurrentProfile(activeProfile);
+          showToast(`¡Bienvenido, ${activeProfile.full_name}!`, "success");
+          setTimeout(() => router.push(ROLE_HOME[activeProfile.role]), 1000);
+          setLoading(false);
+          return;
+        }
       }
-      
-      if (email === "client@test.com") {
-        const mockClientProfile = {
-          id: "mock-client-id",
-          email: "client@test.com",
-          role: "client" as const,
-          full_name: "Vecino Frecuente",
-          store_id: undefined
-        };
-        dbService.setCurrentProfile(mockClientProfile);
-        showToast("¡Acceso concedido! Cargando catálogo de almacenes", "success");
-        setTimeout(() => router.push("/stores"), 1200);
-        setLoading(false);
-        return;
-      }
+    } catch (bffErr: any) {
+      console.warn("[Login] BFF no disponible:", bffErr.message);
     }
 
     try {
-      // 1. Intentar iniciar sesión con Supabase Auth
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
-      }
+      // PASO 2: Autenticar con Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
 
       const user = data.user;
-      if (user) {
-        // 2. Intentar buscar el perfil en Supabase
-        let profileRole: "admin" | "client" = "client";
-        let fullName = "Usuario DigitalMarket";
-        let storeId = undefined;
+      if (!user) throw new Error("No se pudo obtener el usuario de Supabase.");
 
-        try {
-          const { data: profileData, error: profileErr } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", user.id)
-            .single();
+      // PASO 3: Leer perfil
+      let profileRole: UserRole = "client";
+      let fullName = "Usuario DigitalMarket";
+      let storeId: number | undefined = undefined;
 
-          if (!profileErr && profileData) {
-            profileRole = profileData.role || "client";
-            fullName = profileData.full_name || fullName;
-            storeId = profileData.store_id || undefined;
-          }
-        } catch {
-          // No existe la tabla, usar mapeos
-        }
+      const { data: profileData, error: profileErr } = await supabase
+        .from("profiles")
+        .select("id, email, full_name, role, store_id")
+        .eq("id", user.id)
+        .single();
 
-        // Buscar si se registró localmente en localStorage
-        const localProfiles = JSON.parse(localStorage.getItem("digitalmarket_profiles") || "[]");
-        const match = localProfiles.find((p: any) => p.email === email);
-        if (match) {
-          profileRole = match.role;
-          fullName = match.full_name;
-          storeId = match.store_id;
-        }
-
-        const activeProfile = {
-          id: user.id,
-          email: user.email || email,
-          role: profileRole,
-          full_name: fullName,
-          store_id: storeId
-        };
-
-        dbService.setCurrentProfile(activeProfile);
-
-        showToast(`¡Sesión iniciada! Hola, ${fullName}`, "success");
-
-        setTimeout(() => {
-          if (profileRole === "admin") {
-            router.push("/admin");
-          } else {
-            router.push("/stores");
-          }
-        }, 1200);
-      }
-    } catch (err: any) {
-      // Fallback local-first si Supabase falla o no está conectado y coincide con registros locales
-      console.warn("Falla de login en Supabase. Intentando match local.");
-      
-      const localProfiles = JSON.parse(localStorage.getItem("digitalmarket_profiles") || "[]");
-      const match = localProfiles.find((p: any) => p.email === email);
-      
-      if (match) {
-        dbService.setCurrentProfile(match);
-        showToast(`¡Sesión de demostración iniciada! Hola, ${match.full_name}`, "success");
-        setTimeout(() => {
-          if (match.role === "admin") {
-            router.push("/admin");
-          } else {
-            router.push("/stores");
-          }
-        }, 1200);
+      if (!profileErr && profileData) {
+        profileRole = (profileData.role as UserRole) || "client";
+        fullName = profileData.full_name || fullName;
+        storeId = profileData.store_id ?? undefined;
       } else {
-        showToast(err.message || "Credenciales inválidas en el sistema", "error");
+        // Crear perfil desde metadata si no existe
+        const meta = user.user_metadata || {};
+        profileRole = (meta.role as UserRole) || "client";
+        fullName = (meta.full_name as string) || "Usuario DigitalMarket";
+
+        await supabase.from("profiles").upsert({
+          id: user.id,
+          email: user.email ?? email,
+          full_name: fullName,
+          role: profileRole,
+          store_id: storeId ?? null,
+        }, { onConflict: "id" });
+      }
+
+      // Si es seller, resolver store desde store_members
+      if (profileRole === "seller" && !storeId) {
+        const { data: memberData } = await supabase
+          .from("store_members")
+          .select("store_id")
+          .eq("user_id", user.id)
+          .single();
+        storeId = memberData?.store_id;
+      }
+
+      const activeProfile = {
+        id: user.id,
+        email: user.email ?? email,
+        role: profileRole,
+        full_name: fullName,
+        store_id: storeId,
+      };
+
+      dbService.setCurrentProfile(activeProfile);
+      showToast(`¡Bienvenido de vuelta, ${fullName}!`, "success");
+      setTimeout(() => router.push(ROLE_HOME[profileRole]), 1000);
+
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Error desconocido";
+      console.error("[Login] Fallo:", errorMsg);
+
+      if (errorMsg.toLowerCase().includes("invalid login credentials")) {
+        showToast("El correo o la contraseña son incorrectos.", "error");
+      } else if (errorMsg.toLowerCase().includes("email not confirmed")) {
+        showToast("Debes confirmar tu correo antes de iniciar sesión.", "warning");
+      } else {
+        showToast(errorMsg, "error");
       }
     } finally {
       setLoading(false);
@@ -154,37 +139,25 @@ export default function LoginPage() {
       <div className="absolute w-[400px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full bottom-[-100px] right-[-100px]" />
 
       {/* CARD */}
-      <div className="w-full max-w-md bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[40px] p-10 shadow-[0_0_50px_rgba(34,211,238,0.15)] relative z-10 animate-fade-in-slide-up">
-        
-        {/* TITLE */}
+      <div className="w-full max-w-md bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[40px] p-10 shadow-[0_0_50px_rgba(34,211,238,0.15)] relative z-10">
+
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-600 flex items-center justify-center text-3xl mx-auto mb-4 shadow-[0_0_30px_rgba(34,211,238,0.5)]">
             🛍️
           </div>
-          <h1 className="text-4xl font-black text-white mb-2">
-            Bienvenido
-          </h1>
-          <p className="text-gray-400 text-sm">
-            Inicia sesión en la consola de DIGITALMARKET
-          </p>
+          <h1 className="text-4xl font-black text-white mb-2">Bienvenido</h1>
+          <p className="text-gray-400 text-sm">Inicia sesión en DigitalMarket</p>
         </div>
 
-        {/* MOCK ACCOUNTS TIP BOX */}
-        <div className="mb-6 p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-300 space-y-1">
-          <p className="font-bold">💡 Cuentas Rápidas de Demostración (Clave: 123456)</p>
-          <p>• Dueño de Almacén: <code className="bg-black/40 px-1 py-0.5 rounded text-white font-mono">admin@test.com</code></p>
-          <p>• Cliente Vecino: <code className="bg-black/40 px-1 py-0.5 rounded text-white font-mono">client@test.com</code></p>
-        </div>
+
 
         <form onSubmit={handleLogin} className="space-y-6">
-          {/* EMAIL */}
           <div>
-            <label className="text-gray-300 text-sm font-semibold block mb-2">
-              Correo Electrónico
-            </label>
+            <label className="text-gray-300 text-sm font-semibold block mb-2">Correo Electrónico</label>
             <input
+              id="login-email"
               type="email"
-              placeholder="admin@test.com"
+              placeholder="correo@ejemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-black/30 border border-cyan-400/20 rounded-2xl p-4 text-white outline-none focus:border-cyan-400 transition"
@@ -192,12 +165,10 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* PASSWORD */}
           <div>
-            <label className="text-gray-300 text-sm font-semibold block mb-2">
-              Contraseña
-            </label>
+            <label className="text-gray-300 text-sm font-semibold block mb-2">Contraseña</label>
             <input
+              id="login-password"
               type="password"
               placeholder="••••••••"
               value={password}
@@ -207,7 +178,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* SUBMIT BUTTON */}
           <button
             type="submit"
             disabled={loading}
@@ -216,19 +186,18 @@ export default function LoginPage() {
             {loading ? (
               <>
                 <span className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
-                Validando Acceso...
+                Verificando acceso...
               </>
             ) : (
-              "Ingresar a Consola"
+              "Ingresar"
             )}
           </button>
         </form>
 
-        {/* REGISTER LINK */}
-        <p className="text-center text-gray-400 mt-8">
-          ¿No tienes una cuenta comercial?{" "}
+        <p className="text-center text-gray-400 mt-8 text-sm">
+          ¿No tienes una cuenta?{" "}
           <Link href="/register" className="text-cyan-400 hover:text-cyan-300 font-semibold underline">
-            Crear Cuenta
+            Registrarse gratis
           </Link>
         </p>
       </div>

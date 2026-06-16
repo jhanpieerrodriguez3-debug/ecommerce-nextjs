@@ -13,6 +13,7 @@ import { useCart } from "@/context/CartContext";
 
 type Product = {
   id: number;
+  store_id: number;
   title: string;
   price: number;
   image: string;

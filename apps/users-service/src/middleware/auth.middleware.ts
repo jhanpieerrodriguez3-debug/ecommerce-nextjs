@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const SECRET = "digitalmarket_secret";
+const SECRET = process.env.JWT_SECRET || "digitalmarket_secret_dev";
 
 export const verifyToken = (
   req: Request,

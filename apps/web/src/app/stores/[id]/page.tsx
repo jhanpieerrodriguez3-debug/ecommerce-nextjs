@@ -51,6 +51,7 @@ export default function StorePage({ params }: { params: Promise<{ id: string }> 
     }
     addToCart({
       id: product.id,
+      store_id: product.store_id,
       title: product.title,
       price: product.price,
       image: product.image,

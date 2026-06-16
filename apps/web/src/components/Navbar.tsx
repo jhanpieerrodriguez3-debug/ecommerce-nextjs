@@ -7,6 +7,7 @@ import { dbService, Profile } from "@/lib/dbService";
 import { useToast } from "@/context/ToastContext";
 import { supabase } from "@/lib/supabase";
 import { usePathname } from "next/navigation";
+import NotificationBell from "@/components/NotificationBell";
 
 export default function Navbar() {
   const { cart, clearCart } = useCart();
@@ -114,6 +115,8 @@ export default function Navbar() {
               <p className="text-[10px] text-gray-500">{profile.email}</p>
             </div>
 
+            <NotificationBell userId={profile.id} />
+
             <button
               onClick={() => void logout()}
               className="bg-red-950/40 border border-red-500/30 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl text-red-400 text-xs font-bold transition cursor-pointer"
@@ -123,21 +126,47 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* ADMINISTRADOR LOGUEADO */}
-        {profile && profile.role === "admin" && (
+        {/* SUPER_ADMIN LOGUEADO */}
+        {profile && profile.role === "super_admin" && (
           <div className="hidden md:flex items-center gap-6">
             <Link
-              href="/admin"
+              href="/super-admin"
+              className="bg-gradient-to-r from-purple-500/20 to-indigo-600/20 border border-purple-500/30 px-5 py-2.5 rounded-xl text-purple-300 font-bold hover:bg-purple-500/20 transition text-sm flex items-center gap-2 shadow-[0_0_10px_rgba(168,85,247,0.05)]"
+            >
+              🛡️ Panel Super Admin
+            </Link>
+
+            <div className="h-6 w-[1px] bg-white/10" />
+
+            <div className="text-right">
+              <p className="text-xs text-purple-400 font-bold leading-none">{profile.full_name || "Super Admin"}</p>
+              <p className="text-[10px] text-gray-400 font-semibold">Plataforma SaaS</p>
+            </div>
+
+            <button
+              onClick={() => void logout()}
+              className="bg-red-950/40 border border-red-500/30 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl text-red-400 text-xs font-bold transition cursor-pointer"
+            >
+              Salir
+            </button>
+          </div>
+        )}
+
+        {/* STORE_OWNER LOGUEADO */}
+        {profile && profile.role === "store_owner" && (
+          <div className="hidden md:flex items-center gap-6">
+            <Link
+              href="/store-owner"
               className="bg-gradient-to-r from-cyan-400/20 to-blue-600/20 border border-cyan-500/30 px-5 py-2.5 rounded-xl text-cyan-300 font-bold hover:bg-cyan-500/20 transition text-sm flex items-center gap-2 shadow-[0_0_10px_rgba(34,211,238,0.05)]"
             >
-              ⚙️ Inventario
+              🏪 Mi Almacén
             </Link>
 
             <Link
-              href="/dashboard"
+              href="/admin"
               className="text-gray-300 hover:text-cyan-400 transition text-sm font-semibold"
             >
-              📊 Métricas y Caja
+              ⚙️ Inventario
             </Link>
 
             <div className="h-6 w-[1px] bg-white/10" />
@@ -146,6 +175,43 @@ export default function Navbar() {
               <p className="text-xs text-cyan-400 font-bold leading-none">{profile.full_name || "Almacenero"}</p>
               <p className="text-[10px] text-gray-400 font-semibold">Dueño de Almacén</p>
             </div>
+
+            <NotificationBell userId={profile.id} />
+
+            <button
+              onClick={() => void logout()}
+              className="bg-red-950/40 border border-red-500/30 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl text-red-400 text-xs font-bold transition cursor-pointer"
+            >
+              Salir
+            </button>
+          </div>
+        )}
+
+        {/* SELLER LOGUEADO */}
+        {profile && profile.role === "seller" && (
+          <div className="hidden md:flex items-center gap-6">
+            <Link
+              href="/seller"
+              className="bg-gradient-to-r from-blue-500/20 to-indigo-600/20 border border-blue-500/30 px-5 py-2.5 rounded-xl text-blue-300 font-bold hover:bg-blue-500/20 transition text-sm flex items-center gap-2 shadow-[0_0_10px_rgba(59,130,246,0.05)]"
+            >
+              💼 Consola Vendedor
+            </Link>
+
+            <Link
+              href="/admin"
+              className="text-gray-300 hover:text-blue-400 transition text-sm font-semibold"
+            >
+              ⚙️ Inventario
+            </Link>
+
+            <div className="h-6 w-[1px] bg-white/10" />
+
+            <div className="text-right">
+              <p className="text-xs text-blue-400 font-bold leading-none">{profile.full_name || "Vendedor"}</p>
+              <p className="text-[10px] text-gray-400 font-semibold">Vendedor de Almacén</p>
+            </div>
+
+            <NotificationBell userId={profile.id} />
 
             <button
               onClick={() => void logout()}
@@ -202,8 +268,27 @@ export default function Navbar() {
             </>
           )}
 
-          {profile.role === "admin" && (
+          {profile.role === "super_admin" && (
             <>
+              <Link
+                href="/super-admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-gray-300 hover:text-purple-400 py-2 text-sm font-semibold"
+              >
+                🛡️ Panel Super Admin
+              </Link>
+            </>
+          )}
+
+          {profile.role === "store_owner" && (
+            <>
+              <Link
+                href="/store-owner"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-gray-300 hover:text-cyan-400 py-2 text-sm font-semibold"
+              >
+                🏪 Mi Almacén
+              </Link>
               <Link
                 href="/admin"
                 onClick={() => setMobileMenuOpen(false)}
@@ -211,12 +296,24 @@ export default function Navbar() {
               >
                 ⚙️ Inventario
               </Link>
+            </>
+          )}
+
+          {profile.role === "seller" && (
+            <>
               <Link
-                href="/dashboard"
+                href="/seller"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-gray-300 hover:text-cyan-400 py-2 text-sm font-semibold"
+                className="block text-gray-300 hover:text-blue-400 py-2 text-sm font-semibold"
               >
-                📊 Métricas y Caja
+                💼 Consola Vendedor
+              </Link>
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-gray-300 hover:text-blue-400 py-2 text-sm font-semibold"
+              >
+                ⚙️ Inventario
               </Link>
             </>
           )}
