@@ -279,7 +279,8 @@ class DatabaseService {
   // ============================================
   async getStores(onlyApproved = true): Promise<Store[]> {
     try {
-      const bffUrl = process.env.NEXT_PUBLIC_BFF_URL || "http://localhost:4000";
+      const bffUrl = process.env.NEXT_PUBLIC_BFF_URL;
+      if (!bffUrl) throw new Error("NEXT_PUBLIC_BFF_URL is not configured — skipping BFF, falling back to Supabase");
       const res = await fetch(`${bffUrl}/api/stores`);
       if (!res.ok) throw new Error("BFF returned status " + res.status);
       const data = await res.json();

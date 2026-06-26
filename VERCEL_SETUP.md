@@ -95,8 +95,8 @@ En la sección **"Environment Variables"** antes de hacer clic en Deploy:
 
 | Variable | Valor | Ambiente |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://[tu-project-id].supabase.co` | Production + Preview + Development |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `[tu-anon-key]` | Production + Preview + Development |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://kygfupvjcewxxihbnuqf.supabase.co` | Production + Preview + Development |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `sb_publishable_4hQijFzbg8p58rZKU_8MOA_in3Hp6vc` | Production + Preview + Development |
 
 #### ¿Dónde encontrar estos valores en Supabase?
 1. Ve a tu proyecto en [app.supabase.com](https://app.supabase.com)
@@ -106,7 +106,7 @@ En la sección **"Environment Variables"** antes de hacer clic en Deploy:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
    - **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-> ⚠️ **NUNCA** pongas la `service_role` key como variable `NEXT_PUBLIC_*`. Esa clave solo va en servicios backend.
+> ⚠️ **NUNCA** pongas la `service_role` key como variable `NEXT_PUBLI2C_*`. Esa clave solo va en servicios backend.
 
 ---
 

@@ -3,9 +3,28 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**"],
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_BFF_URL",
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "JWT_SECRET",
+        "FRONTEND_URL",
+        "BFF_URL",
+        "USERS_SERVICE_URL",
+        "NODE_ENV"
+      ]
     },
     "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "start": {
       "cache": false,
       "persistent": true
     }

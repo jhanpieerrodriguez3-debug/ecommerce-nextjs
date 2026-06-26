@@ -1,13 +1,32 @@
+/**
+ * supabase.ts — Cliente Supabase para apps/bff (Node.js / Express)
+ *
+ * Usa únicamente variables de entorno sin prefijo NEXT_PUBLIC_.
+ * El prefijo NEXT_PUBLIC_ no tiene significado en Node.js y no debe usarse
+ * en servicios de backend.
+ *
+ * Credenciales:
+ *   - SUPABASE_URL       → URL del proyecto Supabase
+ *   - SUPABASE_ANON_KEY  → Clave anon para operaciones bajo RLS
+ *
+ * Si en el futuro se requiere bypass de RLS, usar SUPABASE_SERVICE_ROLE_KEY
+ * (nunca exponer esta clave al frontend).
+ */
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl =
-  process.env.SUPABASE_URL ||
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  "https://kygfupvjcewxxihbnuqf.supabase.co";
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value || value.trim() === "") {
+    throw new Error(
+      `[BFF] Missing required environment variable: "${name}"\n` +
+        `  → In development: add it to apps/bff/.env.local\n` +
+        `  → In production:  add it to your Vercel project settings`,
+    );
+  }
+  return value.trim();
+}
 
-const supabaseKey =
-  process.env.SUPABASE_ANON_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5Z2Z1cHZqY2V3eHhpaGJudXFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNTE0ODksImV4cCI6MjA5NTkyNzQ4OX0.f64JLs6QPKkMEk62TVbhnAW1cGwcrIbbMDKY_FJ_lNA";
+const supabaseUrl = requireEnv("SUPABASE_URL");
+const supabaseKey = requireEnv("SUPABASE_ANON_KEY");
 
 export const supabase = createClient(supabaseUrl, supabaseKey);

@@ -27,7 +27,8 @@ export default function LoginPage() {
 
     try {
       // PASO 1: Intentar autenticar por BFF/users-service
-      const bffUrl = process.env.NEXT_PUBLIC_BFF_URL || "http://localhost:4000";
+      const bffUrl = process.env.NEXT_PUBLIC_BFF_URL;
+      if (!bffUrl) throw new Error("NEXT_PUBLIC_BFF_URL not configured — skipping BFF auth");
       const bffRes = await fetch(`${bffUrl}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
